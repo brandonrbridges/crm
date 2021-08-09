@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-import Link from 'next/Link'
+import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 import Badge from '@/components/badge'
