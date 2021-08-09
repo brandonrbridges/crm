@@ -53,7 +53,7 @@ const Page = ({ data }) => {
           </div>
           <div className='bg-white dark:bg-gray-700 p-8 rounded'>
             <div className='flex'>
-              <h3 className='font-semibold text-gray-400 dark:text-gray-200'>Today's Sales</h3>
+              <h3 className='font-semibold text-gray-400 dark:text-gray-200'>Todays Sales</h3>
               <div className='bg-yellow-100 inline-block ml-auto p-2 rounded'>
                 <FiShoppingBag className='h-6 text-yellow-400 w-6' />
               </div>
