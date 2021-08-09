@@ -6,7 +6,7 @@ import toast from 'react-hot-toast'
 
 import { FiXCircle } from 'react-icons/fi'
 
-const addLead = () => {
+const AddLead = () => {
   const router = useRouter()
   
   const [openModal, setOpenModal] = useState(false)
@@ -106,4 +106,4 @@ const addLead = () => {
   )
 }
 
-export default addLead
+export default AddLead

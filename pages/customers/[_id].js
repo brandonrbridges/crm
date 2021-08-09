@@ -67,7 +67,7 @@ const Page = ({ data, leads }) => {
           {leads.length > 0 && (
             <Widget>
               <p className='meta-title mb-1'>Financial Overview</p>
-              <p className='mb-4 text-gray-400 text-xs'>Only 'Sold' leads increase this value.</p>
+              <p className='mb-4 text-gray-400 text-xs'>Only Sold leads increase this value.</p>
               <p className='flex items-end mb-8'>
                 <span className='font-bold text-3xl'>
                   {value} kr

@@ -178,10 +178,10 @@ const Page = ({ customer, lead }) => {
               <>
                 <p className='font-bold text-3xl'>{lead.sale_value} kr</p>
                 {lead.sale_value > lead.quote_value && (
-                  <p className='mt-4 text-gray-500 text-sm'>Nice! That's <b>{lead.sale_value - lead.quote_value} kr</b> more than you quoted!</p>
+                  <p className='mt-4 text-gray-500 text-sm'>Nice! Thats <b>{lead.sale_value - lead.quote_value} kr</b> more than you quoted!</p>
                   )}
                 {lead.sale_value < lead.quote_value && (
-                  <p className='mt-4 text-red-500 text-sm'>That's <b>{lead.quote_value - lead.sale_value} kr</b> less than you quoted!</p>
+                  <p className='mt-4 text-red-500 text-sm'>Thats <b>{lead.quote_value - lead.sale_value} kr</b> less than you quoted!</p>
                 )}
 
                 {editSale && (

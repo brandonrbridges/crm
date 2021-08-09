@@ -1,6 +1,6 @@
 import DashboardLayout from '@/layouts/dashboard'
 
-import AddLead from '@/components/addLead'
+import AddLead from '@/components/AddLead'
 import Leads from '@/components/leads'
 
 const Page = ({ data }) => {
