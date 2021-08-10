@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+import { useSession } from 'next-auth/client'
+
 import DashboardLayout from '@/layouts/dashboard'
 import Leads from '@/components/leads'
 
@@ -9,6 +11,8 @@ import wasYesterday from '@/helpers/wasYesterday'
 import { FiArrowRightCircle, FiBarChart, FiCornerRightDown, FiShoppingBag, FiShoppingCart } from 'react-icons/fi'
 
 const Page = ({ data }) => {
+  const [session, loading] = useSession()
+
   let leadsToday = 0, leadsYesterday = 0
 
   data.leads.map((lead) => {
@@ -20,9 +24,10 @@ const Page = ({ data }) => {
       leadsYesterday++
     }
   })
-  
+
   return (
     <DashboardLayout>
+      { session && <h1 className='font-bold mb-4 text-3xl'>Hello, {session.user.name}!</h1>}
       <div className='flex items-center mb-4'>
         <h2 className='font-bold text-gray-400'>Dashboard</h2>
       </div>
