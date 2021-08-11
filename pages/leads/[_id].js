@@ -1,34 +1,41 @@
+// React
 import { useState } from 'react'
 
-import Link from 'next/link'
+// Next
 import { useRouter } from 'next/router'
 
-import Badge from '@/components/badge'
-import CustomerWidget from '@/components/customerWidget'
-import DashboardLayout from '@/layouts/dashboard'
-import Widget from '@/components/widget'
+// Layout
+import DashboardLayout from '@/layouts/Dashboard'
 
+// Components
+import Badge from '@/components/Badge'
+import CustomerWidget from '@/components/CustomerProfile'
+import Widget from '@/components/Widget'
+
+// Helpers
 import isToday from '@/helpers/isToday'
 
-import { FiArrowLeftCircle, FiEdit, FiLock } from 'react-icons/fi'
-
+// Modules
+import { FiEdit } from 'react-icons/fi'
 import moment from 'moment'
-
 import toast from 'react-hot-toast'
 
 const Page = ({ customer, lead }) => {
+  // Router
   const router = useRouter()
 
+  // States
   const [editQuote, setEditQuote] = useState(false)
   const [editSale, setEditSale] = useState(false)
-  
 
+  // Handle deletion
   const handleDelete = async () => {
     await fetch(`/api/leads?_id=${router.query._id}`, { method: 'DELETE' })
     .then(() => router.push('/leads'))
     .then(() => toast.success('Lead has been deleted successfully.'))
   }
 
+  // Handle quote input
   const handleQuoteValue = async (e) => {
     e.preventDefault() 
 
@@ -45,6 +52,7 @@ const Page = ({ customer, lead }) => {
     .then(() => toast.success('Your quote has been saved.'))
   }
 
+  // Handle sale input
   const handleSaleValue = async (e) => {
     e.preventDefault() 
 
@@ -57,30 +65,18 @@ const Page = ({ customer, lead }) => {
       },
       method: 'PUT'
     })
-    .then(() => router.push(window.location.pathname))
-    .then(() => toast.success('Your final cost has been saved.'))
+    .then(() => router.push(window.location.pathname)) // Soft refresh
+    .then(() => toast.success('Your final cost has been saved.')) // 
   }
 
   return (
     <DashboardLayout>
-      <Link href='/leads'>
-        <a className='flex items-center mb-4 text-gray-400 hover:text-black'>
-          <FiArrowLeftCircle className='mr-2' /> Go back to Leads
-        </a>
-      </Link>
-
-      {lead.status == 'sold' && (
-        <div className='bg-white border border-green-400 mb-4 p-4 rounded w-full'>
-          <p className='flex items-center'><FiLock className='mr-2' /> This lead has been sold and is now locked.</p>
-        </div>
-      )}
-
       <div className='gap-4 grid grid-cols-4 h-auto'>
         <div>
           <Widget>
             {isToday(lead.creation_date) && <div className='mb-2 text-center w-full'><Badge className='mx-auto' size='xs' status='new' text='New Lead' /></div>}
 
-            <h1 className='flex font-bold items-center justify-center mb-4 text-3xl text-center'>{lead.customer.name}</h1>
+            <h1 className='flex font-bold items-center justify-center mb-4 text-3xl text-center'>Lead</h1>
 
             <p className='text-center text-gray-500 text-sm'>Added {moment(lead.creation_date).format('DD/MM/YYYY HH:mm')}</p>
             <p className='text-center text-gray-400 text-xs'>({moment(lead.creation_date).fromNow()})</p>
@@ -91,7 +87,7 @@ const Page = ({ customer, lead }) => {
                 <tbody>
                   <tr>
                     <td className='text-gray-500'>Via</td>
-                    <td className='capitalize'>{lead.source}</td>
+                    <td>{lead.source}</td>
                   </tr>
                   <tr>
                     <td className='py-2'>
@@ -131,9 +127,6 @@ const Page = ({ customer, lead }) => {
           </Widget>
         </div>
         <div>
-          <CustomerWidget customer={customer} />
-        </div>
-        <div>
           <Widget margin='mb-4'>
             <p className='meta-title mb-4'>Quick Actions</p>
             <div className='gap-y-4 grid grid-cols-1'>
@@ -142,8 +135,7 @@ const Page = ({ customer, lead }) => {
               </button>
             </div>
           </Widget>
-          <Widget margin='mb-4 relative'>
-            <p className='meta-title mb-4'>Quote Value</p>
+          <Widget title='Quote Value' margin='mb-4 relative'>
             {lead.quote_value && (
               <>
                 <p className='font-bold text-3xl'>{lead.quote_value} kr</p>
@@ -172,8 +164,7 @@ const Page = ({ customer, lead }) => {
               </>
             )}
           </Widget>
-          <Widget margin='mb-4 relative'>
-            <p className='meta-title mb-4'>Sale Value</p>
+          <Widget title='Sale Value' margin='mb-4 relative'>
             {lead.sale_value && (
               <>
                 <p className='font-bold text-3xl'>{lead.sale_value} kr</p>
@@ -212,12 +203,7 @@ const Page = ({ customer, lead }) => {
           </Widget>
         </div>
         <div>
-          <Widget className='mb-4'>
-            <p className='meta-title mb-4'>Notes</p>
-          </Widget>
-          <Widget>
-            <p className='meta-title mb-4'>Activity Log</p>
-          </Widget>
+          <CustomerWidget customer={customer} />
         </div>
       </div>
     </DashboardLayout>

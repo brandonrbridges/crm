@@ -1,20 +1,18 @@
+// Modules
 import mongoose from 'mongoose'
 
+// Variables
 const MONGO_URI = process.env.MONGO_URI
 
-if(!MONGO_URI) {
-  throw new Error('Please define the MONGO_URI environment variable inside .env.local')
-}
+if(!MONGO_URI) throw new Error('Please define the MONGO_URI environment variable inside .env.local')
 
 let cached = global.mongoose
 
-if(!cached) {
-  cached = global.mongoose = { conn: null, promise: null }
-}
+if(!cached) cached = global.mongoose = { connection: null, promise: null }
 
 async function dbConnect() {
-  if(cached.conn) {
-    return cached.conn
+  if(cached.connection) {
+    return cached.connection
   }
 
   if(!cached.promise) {
@@ -30,9 +28,9 @@ async function dbConnect() {
     cached.promise = mongoose.connect(MONGO_URI, options).then(mongoose => { return mongoose })
   }
 
-  cached.conn = await cached.promise
+  cached.connection = await cached.promise
 
-  return cached.conn
+  return cached.connection
 }
 
 export default dbConnect

@@ -1,74 +1,55 @@
-import Link from 'next/link'
+// Next
 import { useRouter } from 'next/router'
 
-import DashboardLayout from '@/layouts/dashboard'
+// Layouts
+import DashboardLayout from '@/layouts/Dashboard'
 
+// Components
+import Badge from '@/components/Badge'
+import CustomerProfile from '@/components/CustomerProfile'
+import Widget from '@/components/Widget'
+
+// Modules
+import { FiArrowRight } from 'react-icons/fi'
 import moment from 'moment'
-
-import { FiArrowLeftCircle, FiArrowRight } from 'react-icons/fi'
-
-import Badge from '@/components/badge'
-import CustomerWidget from '@/components/customerWidget'
-import Widget from '@/components/widget'
-
 import toast from 'react-hot-toast'
 
-const Page = ({ data, leads }) => {
+const Page = ({ customer, leads }) => {
+  // Router
   const router = useRouter()
   
+  // Handle deletion of Customer
   const handleDelete = async () => {
     await fetch(`/api/customers?_id=${router.query._id}`, { method: 'DELETE' })
     .then(() => router.push('/customers'))
     .then(() => toast.success('Customer has been deleted successfully.'))
   }
   
-  let value = 0;
-  let predictedValue = 0;
+  // Variables
+  let value = 0, predictedValue = 0
 
+  // Leads loop
   leads.map(lead => {
-    if(lead.sale_value) {
-      value += lead.sale_value 
-    }
+    // Add to Quote Value
+    if(lead.quote_value && !lead.sale_value) predictedValue += lead.quote_value
 
-    if(lead.quote_value && !lead.sale_value) {
-      predictedValue += lead.quote_value
-    }
+    // Add to Sale Value
+    if(lead.sale_value) value += lead.sale_value 
   })
   
   return (
     <DashboardLayout>
-      <Link href='/customers'>
-        <a className='flex items-center mb-4 text-gray-400 hover:text-black'>
-          <FiArrowLeftCircle className='mr-2' /> Go back to Customers
-        </a>
-      </Link>
-
-
       <div className='gap-4 grid grid-cols-4 h-auto'>
         <div>
-          <CustomerWidget customer={data} />
+          <CustomerProfile customer={customer} />
         </div>
         <div className=''>
-          <Widget margin='mb-4'>
-            <p className='meta-title mb-4'>Leads</p>
-            <div className='gap-y-4 grid grid-cols-1'>
-              {leads.length !== 0 && leads.map((lead, index) => (
-                <Link href={`/leads/${lead._id}`} key={index}>
-                  <a className='border flex items-center justify-between p-2 rounded w-full'>
-                    {moment(lead.creation_date).format('DD/MM/YYYY')}
-                    <Badge size='xs' status={lead.status} text={lead.status} />
-                  </a>
-                </Link>
-              ))}
-
-              {leads.length == 0 && <p className='text-gray-400 text-sm'>This customer has not submitted a lead yet</p>}
-            </div>
+          <Widget margin='mb-4' title='Previous Leads'>
+            <PreviousLeadsTable leads={leads} />
           </Widget>
           {leads.length > 0 && (
-            <Widget>
-              <p className='meta-title mb-1'>Financial Overview</p>
-              <p className='mb-4 text-gray-400 text-xs'>Only Sold leads increase this value.</p>
-              <p className='flex items-end mb-8'>
+            <Widget title='Financial Overview' tip='Only sold leads increase this value.'>
+              <p className='flex items-end'>
                 <span className='font-bold text-3xl'>
                   {value} kr
                 </span>
@@ -78,42 +59,11 @@ const Page = ({ data, leads }) => {
                   </span>
                 )}
               </p>
-              <p className='meta-title mb-4'>Previous Leads</p>
-              <table className='w-full'>
-                <thead>
-                  <tr className='text-left'>
-                    <th>Date</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leads.map((lead, index) => (
-                    <tr className='text-sm' key={index}>
-                      <td>{moment(lead.creation_date).format('DD/MM/YY @ h:mm a')}</td>
-                      <td> 
-                        
-                        {
-                          lead.sale_value ? (
-                            <>{lead.sale_value} kr</>
-                          ) : lead.quote_value ? (
-                            <>{lead.quote_value} kr</>
-                          ) : (
-                            <>N/A</>
-                          )
-                        }
-                      </td>
-                      <td><Badge size='xs' status={lead.status} text={lead.status} /></td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </Widget>
           )}
         </div>
         <div>
-          <Widget>
-            <p className='meta-title mb-4'>Quick Actions</p>
+          <Widget title='Quick Actions'>
             <div className='gap-y-4 grid grid-cols-1'>
               <button onClick={() => handleDelete()} className='border py-1 rounded w-full'>
                 Delete
@@ -123,6 +73,29 @@ const Page = ({ data, leads }) => {
         </div>
       </div>
     </DashboardLayout>
+  )
+}
+
+const PreviousLeadsTable = ({ leads }) => {
+  return (
+    <table className='w-full'>
+      <thead>
+        <tr className='text-left'>
+          <th>Date</th>
+          <th>Amount</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {leads.map((lead, index) => (
+          <tr className='text-sm' key={index}>
+            <td>{moment(lead.creation_date).format('DD/MM/YY @ h:mm a')}</td>
+            <td>{lead.sale_value ? `${lead.sale_value} kr` : lead.quote_value ? `${lead.quote_value} kr` : 'N/A'}</td>
+            <td><Badge size='xs' status={lead.status} text={lead.status} /></td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   )
 }
 
@@ -145,7 +118,7 @@ export async function getServerSideProps(context) {
 
   return {
     props: {
-      data: json.customer[0],
+      customer: json.customer[0],
       leads: leads_json.leads
     }
   }

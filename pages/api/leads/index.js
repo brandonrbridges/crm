@@ -80,7 +80,7 @@ export default async (req, res) => {
       customer = await new Customer({ name, email, phone }).save()
 
     // Add Lead to Database
-    const lead = await new Lead({ 'customer._id': customer._id, 'customer.name': customer.name, type, city, kvm, message, source }).save()
+    const lead = await new Lead({ 'customer._id': customer._id, 'customer.name': customer.name, 'customer.phone': customer.phone, 'customer.email': customer.email, type, city, kvm, message, source }).save()
 
     // Push Lead ID to Customer's Records
     await Customer.findOneAndUpdate({ _id: customer._id }, { $push: { lead_ids: lead._id } }, { new: true })

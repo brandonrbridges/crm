@@ -1,19 +1,25 @@
+// React 
 import { useState } from 'react'
 
+// Next
 import { useRouter } from 'next/router'
 
+// Modules
 import toast from 'react-hot-toast'
-
 import { FiXCircle } from 'react-icons/fi'
 
 const AddLead = () => {
+  // Router
   const router = useRouter()
   
+  // States
   const [openModal, setOpenModal] = useState(false)
   
+  // Handle Form Submission
   const handleSubmit = async (e) => {
     e.preventDefault()
 
+    // Post to API
     await fetch('/api/leads', {
       body: JSON.stringify({
         name: e.target.name.value,
@@ -22,16 +28,17 @@ const AddLead = () => {
         type: e.target.type.value,
         city: e.target.city.value,
         kvm: e.target.kvm.value,
-        message: e.target.message.value
+        message: e.target.message.value,
+        source: 'manual'
       }),
       headers: {
         'Content-Type': 'application/json'
       },
       method: 'POST'
     })
-    .then(() => setOpenModal(false))
-    .then(() => router.push(window.location.pathname))
-    .then(() => toast.success('Your quote has been saved.'))
+    .then(() => setOpenModal(false)) // Close Modal
+    .then(() => router.push(window.location.pathname)) // Soft Refresh Page
+    .then(() => toast.success('Your quote has been saved.')) // Toast Notification
   }
 
   return (

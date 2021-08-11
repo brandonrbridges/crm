@@ -2,10 +2,12 @@ import Link from 'next/link'
 
 import { useSession } from 'next-auth/client'
 
-import DashboardLayout from '@/layouts/dashboard'
-import Leads from '@/components/leads'
+import DashboardLayout from '@/layouts/Dashboard'
+import Leads from '@/components/LeadsTable'
 
+import isThisMonth from '@/helpers/isThisMonth'
 import isToday from '@/helpers/isToday'
+import wasLastMonth from '@/helpers/wasLastMonth'
 import wasYesterday from '@/helpers/wasYesterday'
 
 import { FiArrowRightCircle, FiBarChart, FiCornerRightDown, FiShoppingBag, FiShoppingCart } from 'react-icons/fi'
@@ -13,15 +15,33 @@ import { FiArrowRightCircle, FiBarChart, FiCornerRightDown, FiShoppingBag, FiSho
 const Page = ({ data }) => {
   const [session, loading] = useSession()
 
+  let soldThisMonth = 0, soldLastMonth = 0
   let leadsToday = 0, leadsYesterday = 0
+  let soldToday = 0, soldYesterday = 0
 
   data.leads.map((lead) => {
     if(isToday(lead.creation_date)) {
       leadsToday++
+
+      if(lead.status == 'sold') {
+        soldToday++
+      }
     }
 
     if(wasYesterday(lead.creation_date)) {
       leadsYesterday++
+
+      if(lead.status == 'sold') {
+        soldYesterday++
+      }
+    }
+
+    if(isThisMonth(lead.creation_date) && lead.status == 'sold') {
+      soldThisMonth++
+    }
+
+    if(wasLastMonth(lead.creation_date) && lead.status == 'sold') {
+      soldLastMonth++
     }
   })
 
@@ -65,11 +85,17 @@ const Page = ({ data }) => {
             </div>
             <p>
               <span className='font-semibold text-4xl dark:text-white'>
-                0
+                {soldToday}
               </span>
-              <span className='ml-2 text-gray-400'>
-                +0 from last yesterday
-              </span>
+                {soldToday !== soldYesterday ? (
+                  <span className={`ml-2 text-${(soldToday > soldYesterday ? 'green' : 'red')}-400`}>
+                    {(soldYesterday - soldToday).toString().replace('-', '+')} {(soldToday > soldYesterday ? 'more than' : 'less than')} yesterday
+                  </span>
+                ) : (
+                  <span className='ml-2 text-gray-400'>
+                    equal to yesterday              
+                  </span>
+                )}
             </p>
           </div>
           <div className='bg-white dark:bg-gray-700 p-8 rounded'>
@@ -81,11 +107,17 @@ const Page = ({ data }) => {
             </div>
             <p>
               <span className='font-semibold text-4xl dark:text-white'>
-                0
+                {soldThisMonth}
               </span>
-              <span className='ml-2 text-gray-400'>
-                +0 from last month
-              </span>
+                {soldThisMonth !== soldLastMonth ? (
+                  <span className={`ml-2 text-${(soldThisMonth > soldLastMonth ? 'green' : 'red')}-400`}>
+                    {(soldLastMonth - soldThisMonth).toString().replace('-', '+')} {(soldThisMonth > soldLastMonth ? 'more than' : 'less than')} last month
+                  </span>
+                ) : (
+                  <span className='ml-2 text-gray-400'>
+                    equal to yesterday              
+                  </span>
+                )}
             </p>
           </div>
           <div className='bg-white dark:bg-gray-700 p-8 rounded'>

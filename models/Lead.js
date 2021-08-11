@@ -7,12 +7,10 @@ const schema = new Schema({
     type: Date
   },
   customer: {
-    name: {
-      type: String
-    },
-    _id: {
-      type: Schema.Types.ObjectId
-    }
+    name: String,
+    phone: String,
+    email: String,
+    _id: Schema.Types.ObjectId
   },
   kvm: String,
   message: String,

@@ -1,14 +1,13 @@
-import DashboardLayout from '@/layouts/dashboard'
+// Layout
+import DashboardLayout from '@/layouts/Dashboard'
 
-import Customers from '@/components/customers'
+// Components
+import CustomersTable from '@/components/CustomersTable'
 
-const Page = ({ data }) => {
+const Page = ({ customers }) => {
   return (
-    <DashboardLayout>
-      <div className='flex items-center mb-4'>
-        <h2 className='font-bold text-gray-400'>Customers <span className='font-normal'>({data.customers.length})</span></h2>
-      </div>
-      <Customers data={data} />
+    <DashboardLayout title={`Customers (${customers.length})`}>
+      <CustomersTable customers={customers} />
     </DashboardLayout>
   )
 }
@@ -29,10 +28,9 @@ export async function getServerSideProps(context) {
 
   return {
     props: {
-      data: json
+      customers: json.customers
     }
   }
 }
-
 
 export default Page

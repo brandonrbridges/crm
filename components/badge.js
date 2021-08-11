@@ -1,8 +1,7 @@
-import { FiThumbsDown, FiThumbsUp } from 'react-icons/fi'
-
 const Badge = ({ className, text, size, status }) => {
   let color
 
+  // Colour Switcher based on Status
   switch(status) {
     case 'complete':
       color = 'green'
@@ -20,7 +19,7 @@ const Badge = ({ className, text, size, status }) => {
       color = 'green'
       break
     default:
-      color = 'grey'
+      color = 'gray'
   }
 
   return (
