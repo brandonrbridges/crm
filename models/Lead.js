@@ -1,12 +1,7 @@
 import mongoose, { Schema } from 'mongoose'
 
 const schema = new Schema({
-  brand: String,
   city: String,
-  contacted_via: {
-    default: 'website',
-    type: String
-  },
   creation_date: {
     default: Date.now,
     type: Date
@@ -23,6 +18,7 @@ const schema = new Schema({
   message: String,
   quote_value: Number,
   sale_value: Number,
+  source: String,
   status: {
     default: 'pending',
     type: String

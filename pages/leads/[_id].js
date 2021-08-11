@@ -90,8 +90,8 @@ const Page = ({ customer, lead }) => {
               <table className='w-full'>
                 <tbody>
                   <tr>
-                    <td className='text-gray-500'>Brand</td>
-                    <td className='capitalize'>[brand]</td>
+                    <td className='text-gray-500'>Via</td>
+                    <td className='capitalize'>{lead.source}</td>
                   </tr>
                   <tr>
                     <td className='py-2'>
@@ -126,7 +126,7 @@ const Page = ({ customer, lead }) => {
             <p className='font-bold mt-4 mb-4 text-gray-400 uppercase text-xs'>Status</p>
             <div className='border my-4 p-4 rounded'>
               <Badge className='w-full' status={lead.status} text={lead.status} />
-              <p className='mt-2 text-gray-400 text-right text-sm'>Sent in via {lead.contacted_via}</p> 
+              <p className='mt-2 text-gray-400 text-right text-sm'>Sent in via {lead.source}</p> 
             </div>
           </Widget>
         </div>

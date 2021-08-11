@@ -28,7 +28,7 @@ export default async (req, res) => {
 
   if(req.method == 'POST') {
     // Prepare variables
-    let name, email, phone, company, type, city, kvm, message
+    let name, email, phone, company, type, city, kvm, message, source
 
     if(req.query) {
       if(req.query.name) 
@@ -47,6 +47,8 @@ export default async (req, res) => {
         kvm = req.query.kvm
       if(req.query.message) 
         message = req.query.message
+      if(req.query.source)
+        source = req.query.source
     }
 
     if(req.body) {
@@ -66,6 +68,8 @@ export default async (req, res) => {
         kvm = req.body.kvm
       if(req.body.message) 
         message = req.body.message
+      if(req.body.source)
+        source = req.body.source
     }
 
     // Find Customer
@@ -76,7 +80,7 @@ export default async (req, res) => {
       customer = await new Customer({ name, email, phone }).save()
 
     // Add Lead to Database
-    const lead = await new Lead({ 'customer._id': customer._id, 'customer.name': customer.name, type, city, kvm, message }).save()
+    const lead = await new Lead({ 'customer._id': customer._id, 'customer.name': customer.name, type, city, kvm, message, source }).save()
 
     // Push Lead ID to Customer's Records
     await Customer.findOneAndUpdate({ _id: customer._id }, { $push: { lead_ids: lead._id } }, { new: true })
