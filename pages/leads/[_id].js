@@ -35,40 +35,6 @@ const Page = ({ customer, lead }) => {
     .then(() => toast.success('Lead has been deleted successfully.'))
   }
 
-  // Handle quote input
-  const handleQuoteValue = async (e) => {
-    e.preventDefault() 
-
-    const res = await fetch(`/api/leads/${router.query._id}`, {
-      body: JSON.stringify({
-        quote_value: e.target.quote_value.value
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'PUT'
-    })
-    .then(() => router.push(window.location.pathname))
-    .then(() => toast.success('Your quote has been saved.'))
-  }
-
-  // Handle sale input
-  const handleSaleValue = async (e) => {
-    e.preventDefault() 
-
-    const res = await fetch(`/api/leads/${router.query._id}`, {
-      body: JSON.stringify({
-        sale_value: e.target.sale_value.value
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'PUT'
-    })
-    .then(() => router.push(window.location.pathname)) // Soft refresh
-    .then(() => toast.success('Your final cost has been saved.')) // 
-  }
-
   return (
     <DashboardLayout>
       <div className='gap-4 grid grid-cols-4 h-auto'>
@@ -122,23 +88,30 @@ const Page = ({ customer, lead }) => {
             <p className='font-bold mt-4 mb-4 text-gray-400 uppercase text-xs'>Status</p>
             <div className='border my-4 p-4 rounded'>
               <Badge className='w-full' status={lead.status} text={lead.status} />
-              <p className='mt-2 text-gray-400 text-right text-sm'>Sent in via {lead.source}</p> 
+              {/* <p className='mt-2 text-gray-400 text-right text-sm'>Sent in via {lead.source}</p>  */}
             </div>
           </Widget>
         </div>
         <div>
-          <Widget margin='mb-4'>
+          <CustomerWidget customer={customer} />
+          <Widget margin='mt-4'>
             <p className='meta-title mb-4'>Quick Actions</p>
             <div className='gap-y-4 grid grid-cols-1'>
               <button onClick={() => handleDelete()} className='border py-1 rounded w-full'>
                 Delete
               </button>
+              <ChangeStatusForm lead={lead} />
             </div>
           </Widget>
-          <Widget title='Quote Value' margin='mb-4 relative'>
-            {lead.quote_value && (
+        </div>
+        <div>
+          <Widget title='Quote' margin='mb-4 relative'>
+            {lead.quote && (
               <>
-                <p className='font-bold text-3xl'>{lead.quote_value} kr</p>
+                <p className='font-bold text-3xl'>{lead.quote.service + lead.quote.extra} kr</p>
+                <p>Service Cost: {lead.quote.service} kr</p>
+                <p>Extra Cost: {lead.quote.extra} kr</p>
+
                 {editQuote && (
                   <>
                     <form onSubmit={handleQuoteValue} className='flex mt-4 whitespace-nowrap'>
@@ -155,35 +128,16 @@ const Page = ({ customer, lead }) => {
               </>
             )}
 
-            {!lead.quote_value && (
-              <>
-                <form onSubmit={handleQuoteValue} className='flex whitespace-nowrap'>
-                  <input type='number' name='quote_value' className='p-2 rounded-r-none w-full' />
-                  <button type='submit' className='bg-gray-300 px-2 rounded-l-none'>Add Quote</button>
-                </form>
-              </>
-            )}
+            {!lead.quote && <AddQuoteForm />}
           </Widget>
-          <Widget title='Sale Value' margin='mb-4 relative'>
-            {lead.sale_value && (
+          <Widget title='Sale' margin='mb-4 relative'>
+            {lead.sale && (
               <>
-                <p className='font-bold text-3xl'>{lead.sale_value} kr</p>
-                {lead.sale_value > lead.quote_value && (
-                  <p className='mt-4 text-gray-500 text-sm'>Nice! Thats <b>{lead.sale_value - lead.quote_value} kr</b> more than you quoted!</p>
-                  )}
-                {lead.sale_value < lead.quote_value && (
-                  <p className='mt-4 text-red-500 text-sm'>Thats <b>{lead.quote_value - lead.sale_value} kr</b> less than you quoted!</p>
-                )}
+                <p className='font-bold text-3xl'>{lead.sale.service + lead.sale.extra} kr</p>
+                {lead.sale.service && <p>Service Cost: {lead.sale.service} kr (incl. RUT)</p>}
+                {lead.sale.extra && <p>Extra Cost: {lead.sale.extra} kr</p>}
 
-                {editSale && (
-                  <>
-                    <form onSubmit={handleSaleValue} className='flex mt-4 whitespace-nowrap'>
-                      <input type='number' name='sale_value' className='p-2 rounded-r-none w-full' />
-                      <button type='submit' className='bg-gray-300 px-2 rounded-l-none'>Update Sale</button>
-                    </form>
-                    <p className='mt-4 text-gray-400 text-sm'>If no value is entered, the quote value will be used.</p>
-                  </>
-                )}
+                {editSale && <AddSaleForm lead={lead} />}
 
                 <button type='button' onClick={() => setEditSale(!editSale)} className='absolute text-gray-400 hover:text-black top-12 right-12'>
                   <FiEdit />
@@ -191,22 +145,123 @@ const Page = ({ customer, lead }) => {
               </>
             )}
 
-            {!lead.sale_value && (
-              <>
-                <form onSubmit={handleSaleValue} className='flex whitespace-nowrap'>
-                  <input type='number' name='sale_value' className='p-2 rounded-r-none w-full' />
-                  <button type='submit' className='bg-gray-300 px-2 rounded-l-none'>Add Sale</button>
-                </form>
-                <p className='mt-4 text-gray-400 text-sm'>If no value is entered, the quote value will be used.</p>
-              </>
-            )}
+            {!lead.sale && <AddSaleForm lead={lead} />}
           </Widget>
         </div>
-        <div>
-          <CustomerWidget customer={customer} />
-        </div>
+        
       </div>
     </DashboardLayout>
+  )
+}
+
+const AddQuoteForm = () => {
+  // Router
+  const router = useRouter()
+  
+  // Handle quote input
+  const handleQuoteValue = async (e) => {
+    e.preventDefault() 
+
+    const res = await fetch(`/api/leads/${router.query._id}`, {
+      body: JSON.stringify({
+        quote: {
+          service: e.target.quote_service.value,
+          extra: e.target.quote_extra.value
+        }
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'PUT'
+    })
+    .then(() => router.push(window.location.pathname)) // Soft refresh
+    .then(() => toast.success('Your quote has been saved.')) // Toast
+  }
+  
+  return (
+    <form onSubmit={handleQuoteValue}>
+      <label className='text-gray-400 text-sm'>Service Cost</label>
+      <input type='number' name='quote_service' className='mb-2 p-2 rounded w-full' />
+      <label className='text-gray-400 text-sm'>Additional Cost</label>
+      <input type='number' name='quote_extra' className='mb-4 p-2 rounded w-full' />
+      <button type='submit' className='bg-gray-100 hover:bg-gray-200 p-2 rounded w-full'>Add Quote</button>
+    </form>
+  )
+}
+
+const AddSaleForm = ({ lead }) => {
+  // Router
+  const router = useRouter()
+  
+  // Handle sale input
+  const handleSaleValue = async (e) => {
+    e.preventDefault() 
+
+    const res = await fetch(`/api/leads/${router.query._id}`, {
+      body: JSON.stringify({
+        sale: {
+          service: e.target.sale_service.value,
+          extra: e.target.sale_extra.value
+        }
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'PUT'
+    })
+    .then(() => router.push(window.location.pathname)) // Soft refresh
+    .then(() => toast.success('Your final cost has been saved.')) // Toast
+  }
+
+  return (
+    <>
+      <form onSubmit={handleSaleValue}>
+        <label className='text-gray-400 text-sm'>Service Cost</label>
+        <input type='number' name='sale_service' className='mb-2 p-2 rounded w-full' placeholder={(lead.quote ? lead.quote.service * 2 : '')} />
+        <label className='text-gray-400 text-sm'>Additional Cost</label>
+        <input type='number' name='sale_extra' className='mb-4 p-2 rounded w-full' placeholder={(lead.quote ? lead.quote.extra : '')} />
+        <button type='submit' className='bg-gray-100 hover:bg-gray-200 p-2 rounded w-full'>Add Sale</button>
+      </form>
+      <p className='mt-4 text-gray-400 text-sm'>If no value is entered, the quote values will be used.</p>
+    </>
+  )
+}
+
+const ChangeStatusForm = ({ lead }) => {
+  // Router
+  const router = useRouter()
+
+  const [value, setValue] = useState(lead.status)
+
+  const options = ['called', 'quoted', 'accepted', 'sold', 'booked', 'complete', 'rejected']
+
+  // Handle status change
+  const handleStatusChange = async (newValue) => {
+    console.log(newValue)
+
+    setValue(newValue)
+
+    const res = await fetch(`/api/leads/${router.query._id}`, {
+      body: JSON.stringify({
+        status: newValue
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'PUT'
+    })
+    .then(() => router.push(window.location.pathname)) // Soft Refresh
+    .then(() => toast.success('Status has been updated successfully.')) // Toast
+  }
+  
+  return (
+    <form>
+      <label>Edit Status</label>
+      <select name='status' value={value} onChange={e => handleStatusChange(e.currentTarget.value)} className='capitalize'>
+        <option hidden>Select</option>
+        {options.map(option => <option value={option} defaultChecked={(value == option ? true : false)} className='capitalize'>{option}</option>)}
+      </select>
+    </form>
   )
 }
 

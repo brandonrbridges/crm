@@ -1,49 +1,29 @@
+// Next
 import Link from 'next/link'
 
+// Next Auth
 import { useSession } from 'next-auth/client'
 
+// Layouts
 import DashboardLayout from '@/layouts/Dashboard'
-import Leads from '@/components/LeadsTable'
 
+// Components
+import Leads from '@/components/LeadsTable'
+import Widget from '@/components/Widget'
+
+// Helpers
+import calculateNetProfit from '@/helpers/calculateNetProfit'
 import isThisMonth from '@/helpers/isThisMonth'
 import isToday from '@/helpers/isToday'
 import wasLastMonth from '@/helpers/wasLastMonth'
 import wasYesterday from '@/helpers/wasYesterday'
 
+// Modules
+import { Bar } from 'react-chartjs-2'
 import { FiArrowRightCircle, FiBarChart, FiCornerRightDown, FiShoppingBag, FiShoppingCart } from 'react-icons/fi'
 
 const Page = ({ data }) => {
   const [session, loading] = useSession()
-
-  let soldThisMonth = 0, soldLastMonth = 0
-  let leadsToday = 0, leadsYesterday = 0
-  let soldToday = 0, soldYesterday = 0
-
-  data.leads.map((lead) => {
-    if(isToday(lead.creation_date)) {
-      leadsToday++
-
-      if(lead.status == 'sold') {
-        soldToday++
-      }
-    }
-
-    if(wasYesterday(lead.creation_date)) {
-      leadsYesterday++
-
-      if(lead.status == 'sold') {
-        soldYesterday++
-      }
-    }
-
-    if(isThisMonth(lead.creation_date) && lead.status == 'sold') {
-      soldThisMonth++
-    }
-
-    if(wasLastMonth(lead.creation_date) && lead.status == 'sold') {
-      soldLastMonth++
-    }
-  })
 
   return (
     <DashboardLayout>
@@ -54,98 +34,12 @@ const Page = ({ data }) => {
 
       <div className='gap-4 grid grid-cols-2'>
         <div className='gap-4 grid grid-cols-2'>
-          <div className='bg-white dark:bg-gray-700 p-8 rounded'>
-            <div className='flex'>
-              <h3 className='font-semibold text-gray-400 dark:text-gray-200'>New Leads <span className='text-xs'>(Today)</span></h3>
-              <div className='bg-green-100 inline-block ml-auto p-2 rounded'>
-                <FiCornerRightDown className='h-6 text-green-400 w-6' />
-              </div>
-            </div>
-            <p>
-              <span className='font-semibold text-4xl dark:text-white'>
-                {leadsToday}
-              </span>
-                {leadsToday !== leadsYesterday ? (
-                  <span className={`ml-2 text-${(leadsToday > leadsYesterday ? 'green' : 'red')}-400`}>
-                    {(leadsYesterday - leadsToday).toString().replace('-', '+')} {(leadsToday > leadsYesterday ? 'more than' : 'less than')} yesterday
-                  </span>
-                ) : (
-                  <span className='ml-2 text-gray-400'>
-                    equal to yesterday              
-                  </span>
-                )}
-            </p>
-          </div>
-          <div className='bg-white dark:bg-gray-700 p-8 rounded'>
-            <div className='flex'>
-              <h3 className='font-semibold text-gray-400 dark:text-gray-200'>Todays Sales</h3>
-              <div className='bg-yellow-100 inline-block ml-auto p-2 rounded'>
-                <FiShoppingBag className='h-6 text-yellow-400 w-6' />
-              </div>
-            </div>
-            <p>
-              <span className='font-semibold text-4xl dark:text-white'>
-                {soldToday}
-              </span>
-                {soldToday !== soldYesterday ? (
-                  <span className={`ml-2 text-${(soldToday > soldYesterday ? 'green' : 'red')}-400`}>
-                    {(soldYesterday - soldToday).toString().replace('-', '+')} {(soldToday > soldYesterday ? 'more than' : 'less than')} yesterday
-                  </span>
-                ) : (
-                  <span className='ml-2 text-gray-400'>
-                    equal to yesterday              
-                  </span>
-                )}
-            </p>
-          </div>
-          <div className='bg-white dark:bg-gray-700 p-8 rounded'>
-            <div className='flex'>
-              <h3 className='font-semibold text-gray-400 dark:text-gray-200'>Monthly Sales</h3>
-              <div className='bg-blue-100 inline-block ml-auto p-2 rounded'>
-                <FiShoppingCart className='h-6 text-blue-400 w-6' />
-              </div>
-            </div>
-            <p>
-              <span className='font-semibold text-4xl dark:text-white'>
-                {soldThisMonth}
-              </span>
-                {soldThisMonth !== soldLastMonth ? (
-                  <span className={`ml-2 text-${(soldThisMonth > soldLastMonth ? 'green' : 'red')}-400`}>
-                    {(soldLastMonth - soldThisMonth).toString().replace('-', '+')} {(soldThisMonth > soldLastMonth ? 'more than' : 'less than')} last month
-                  </span>
-                ) : (
-                  <span className='ml-2 text-gray-400'>
-                    equal to yesterday              
-                  </span>
-                )}
-            </p>
-          </div>
-          <div className='bg-white dark:bg-gray-700 p-8 rounded'>
-            <div className='flex'>
-              <h3 className='font-semibold text-gray-400 dark:text-gray-200'>Monthly Revenue</h3>
-              <div className='bg-pink-100 inline-block ml-auto p-2 rounded'>
-                <FiBarChart className='h-6 text-pink-400 w-6' />
-              </div>
-            </div>
-            <p>
-              <span className='font-semibold text-4xl dark:text-white'>
-                0
-              </span>
-              <span className='ml-2 text-gray-400'>
-                +0 from last month
-              </span>
-            </p>
-          </div>
+          <NewLeadsWidget data={data} />
+          <TodaysSalesWidget data={data} />
+          <MonthlySalesWidget data={data} />
+          <MonthlyGrossProfitWidget data={data} />
         </div>
-        <div className='bg-white dark:bg-gray-700 p-8 rounded'>
-            <div className='flex'>
-              <h3 className='font-semibold text-gray-400 dark:text-gray-200'>Monthly Profit</h3>
-              <div className='bg-purple-100 inline-block ml-auto p-2 rounded'>
-                <FiCornerRightDown className='h-6 text-purple-400 w-6' />
-              </div>
-            </div>
-            <p className='text-gray-400 text-sm'>A chart will go here</p>
-          </div>
+        <NetProfitWidget data={data} />
       </div>
 
       <div className='flex items-center my-4'>
@@ -157,9 +51,220 @@ const Page = ({ data }) => {
         </Link>
       </div>
 
-      <Leads data={data} />
+      <Leads leads={data.leads} />
       
     </DashboardLayout>
+  )
+}
+
+const NewLeadsWidget = ({ data }) => {
+  let leadsToday = 0, leadsYesterday = 0 
+  let leadsPending = 0, leadsQuoted = 0
+  let leadsQuoteTotal = 0
+  
+  data.leads.map((lead) => {
+    if(isToday(lead.creation_date)) {
+      leadsToday++
+
+      if(lead.status == 'pending') leadsPending++
+      if(lead.status == 'quoted' ) leadsQuoted++
+
+      if(lead.status !== 'pending') {
+        leadsQuoteTotal += (lead.quote.service + lead.quote.extra)
+      }
+    }
+
+    if(wasYesterday(lead.creation_date)) {
+      leadsYesterday++
+    }
+  })
+  
+  return (
+    <Widget title='New Leads Today'>
+      <div className='flex'>
+        <div className='absolute bg-green-100 inline-block ml-auto p-2 rounded top-10 right-10'>
+          <FiCornerRightDown className='h-6 text-green-400 w-6' />
+        </div>
+      </div>
+      <p className='font-semibold text-4xl dark:text-white'>
+        {leadsToday}
+      </p>
+      <p className='mt-4 text-gray-400 text-sm'>
+        Your quotes today are worth {leadsQuoteTotal} kr
+      </p>
+    </Widget>
+  )
+}
+
+const TodaysSalesWidget = ({ data }) => {
+  let soldToday = 0, soldYesterday = 0
+  let leadsSaleTotal = 0
+
+  data.leads.map((lead) => {
+    if(isToday(lead.creation_date) && lead.status == 'sold') {
+      soldToday++
+
+      leadsSaleTotal += (lead.sale.service + lead.sale.extra)
+    }
+
+    if(wasYesterday(lead.creation_date) && lead.status == 'sold') soldYesterday++
+  })
+
+  return (
+    <Widget title='Todays Sales'>
+      <div className='flex'>
+        <div className='absolute bg-yellow-100 inline-block ml-auto p-2 right-10 rounded top-10'>
+          <FiShoppingBag className='h-6 text-yellow-400 w-6' />
+        </div>
+      </div>
+      <p className='font-semibold text-4xl dark:text-white'>
+        {leadsSaleTotal} kr
+      </p>
+      <p className='mt-4 text-gray-400 text-sm'>
+        You have sold {soldToday - soldYesterday} lead{(soldToday == 1 ? '' : 's')} today compared to yesterday
+      </p>
+    </Widget>
+  )
+}
+
+const MonthlySalesWidget = ({ data }) => {
+  let soldThisMonth = 0, soldLastMonth = 0
+  let leadsSaleTotal = 0
+
+  data.leads.map((lead) => {
+    if(isThisMonth(lead.creation_date) && lead.status == 'sold') {
+      soldThisMonth++
+
+      leadsSaleTotal += (lead.sale.service + lead.sale.extra)
+    }
+
+    if(wasLastMonth(lead.creation_date) && lead.status == 'sold') soldLastMonth++
+  })
+  
+  return (
+    <Widget title='Monthly Sales'>
+      <div className='flex'>
+        <div className='absolute bg-blue-100 inline-block ml-auto p-2 right-10 rounded top-10'>
+          <FiShoppingCart className='h-6 text-blue-400 w-6' />
+        </div>
+      </div>
+      <p className='font-semibold text-4xl dark:text-white'>
+        {leadsSaleTotal} kr
+      </p>
+      <p className='mt-4 text-gray-400 text-sm'>
+        You have sold {soldThisMonth - soldLastMonth} lead{(soldThisMonth == 1 ? '' : 's')} this month compared to last month
+      </p>
+    </Widget>
+  )
+}
+
+const MonthlyGrossProfitWidget = ({ data }) => {
+  let revenueThisMonth = 0, revenueLastMonth = 0
+
+  data.leads.map((lead) => {
+    if(lead.status !== 'pending' && lead.status !== 'quoted') {
+      if(isThisMonth(lead.creation_date)) revenueThisMonth += lead.sale.service - ((lead.sale.service / 2) + lead.sale.extra)
+      if(wasLastMonth(lead.creation_date)) revenueLastMonth += lead.sale.service - ((lead.sale.service / 2) + lead.sale.extra)
+    }
+  })
+
+  return (
+    <Widget title='Gross Profit This Month'>
+      <div className='flex'>
+        <div className='absolute bg-pink-100 inline-block ml-auto p-2 right-10 rounded top-10'>
+          <FiBarChart className='h-6 text-pink-400 w-6' />
+        </div>
+      </div>
+      <p className='font-semibold text-4xl dark:text-white'>
+        {revenueThisMonth} kr
+      </p>
+      <p className='mt-4 text-gray-400 text-sm'>
+        You made {revenueLastMonth} kr last month
+      </p>
+    </Widget>
+  )
+}
+
+const NetProfitWidget = ({ data }) => {
+  let january = 0, february = 0, march = 0, april = 0, may = 0, june = 0, july = 0, august = 0, september = 0, october = 0, november = 0, december = 0
+  
+  data.leads.map((lead) => {
+    const date = new Date(lead.creation_date)
+    if(date.getMonth() == 0) january += calculateNetProfit(lead)
+    if(date.getMonth() == 1) february += calculateNetProfit(lead)
+    if(date.getMonth() == 2) march += calculateNetProfit(lead)
+    if(date.getMonth() == 3) april += calculateNetProfit(lead)
+    if(date.getMonth() == 4) may += calculateNetProfit(lead)
+    if(date.getMonth() == 5) june += calculateNetProfit(lead)
+    if(date.getMonth() == 6) july += calculateNetProfit(lead)
+    if(date.getMonth() == 7) august += calculateNetProfit(lead)
+    if(date.getMonth() == 8) september += calculateNetProfit(lead)
+    if(date.getMonth() == 9) october += calculateNetProfit(lead)
+    if(date.getMonth() == 10) november += calculateNetProfit(lead)
+    if(date.getMonth() == 11) december += calculateNetProfit(lead)
+  })
+  
+  const state = {
+    labels: [
+      'January', 
+      'February', 
+      'March',
+      'April', 
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ],
+    datasets: [
+      {
+        label: 'Net Profit',
+        backgroundColor: 'rgba(75,192,192,1)',
+        borderColor: 'rgba(0,0,0,0)',
+        borderWidth: 2,
+        data: [
+          january,
+          february,
+          march,
+          april,
+          may,
+          june,
+          july,
+          august,
+          september,
+          october,
+          november,
+          december
+        ]
+      }
+    ]
+  }
+
+  return (
+    <Widget title='Net Profit'>
+      <div className='flex'>
+        <div className='absolute bg-purple-100 inline-block ml-auto p-2 right-10 rounded top-10'>
+          <FiCornerRightDown className='h-6 text-purple-400 w-6' />
+        </div>
+      </div>
+      <Bar 
+        data={state}
+        options={{
+          title: {
+            display: true,
+            text: 'Net Profit',
+            fontSize: 20
+          },
+          legend: {
+            display: true,
+            position: 'right'
+          }
+        }}
+      />
+    </Widget>
   )
 }
 
@@ -179,7 +284,7 @@ export async function getServerSideProps(context) {
 
   return {
     props: {
-      data: json
+      data: json,
     }
   }
 }

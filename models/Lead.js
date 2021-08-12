@@ -14,8 +14,14 @@ const schema = new Schema({
   },
   kvm: String,
   message: String,
-  quote_value: Number,
-  sale_value: Number,
+  quote: {
+    service: Number,
+    extra: Number
+  },
+  sale: {
+    service: Number,
+    extra: Number
+  },
   source: String,
   status: {
     default: 'pending',

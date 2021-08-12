@@ -26,24 +26,60 @@ export default async (req, res) => {
     let lead = await Lead.find({ _id }).lean()
 
     if(lead) {
-      let update = {}
+      if(req.body.quote) {
+        await Lead.findOneAndUpdate(
+          { 
+            _id 
+          },
+          {
+            $set: {
+              'quote.service': req.body.quote.service,
+              'quote.extra': req.body.quote.extra,
+              'sale.service': null,
+              'sale.extra': null,
+              status: 'quoted'
 
-      if(req.body.quote_value) {
-        update.quote_value = req.body.quote_value
-        update.status = 'quoted'
-        update.sale_value = null
+            }
+          },
+          { 
+            new: true 
+          }
+        )
       }
 
-      if(req.body.sale_value) {
-        update.sale_value = req.body.sale_value
-        update.status = 'sold'
+      if(req.body.sale) {
+        await Lead.findOneAndUpdate(
+          { 
+            _id 
+          },
+          {
+            $set: {
+              'sale.service': req.body.sale.service,
+              'sale.extra': req.body.sale.extra,
+              status: 'sold'
+            }
+          },
+          { 
+            new: true 
+          }
+        )
       }
 
-      await Lead.findOneAndUpdate(
-        { _id }, 
-        update, 
-        { new: true }
-      )
+      if(req.body.status) {
+        await Lead.findOneAndUpdate(
+          {
+            _id
+          },
+          {
+            $set: {
+              status: req.body.status
+            }
+          },
+          {
+            new: true
+          }
+        )
+      }
     } else {
       return res.status(200).json({ error: 'no record found' })
     }

@@ -17,6 +17,14 @@ export default async (req, res) => {
       if(req.query.customer_id) {
         leads = await Lead.find({ 'customer._id': req.query.customer_id }).sort({ creation_date: -1 }).lean()
       }
+
+      if(req.query.month) {
+        let date = new Date()
+        let firstDay = new Date(date.getFullYear(), (req.query.month - 1), 1)
+        let lastDay = new Date(date.getFullYear(), (req.query.month - 1) + 1, 0)
+
+        leads = await Lead.find({ creation_date: { $gte: firstDay, $lte: lastDay }}).sort({ creation_date: -1 }).lean()
+      }
     }
 
     if(leads) {

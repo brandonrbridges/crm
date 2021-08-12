@@ -51,8 +51,13 @@ body {
 }
 
 input,
+select,
 textarea {
-  @apply border;
+  @apply border px-2 py-1 w-full;
+}
+
+label {
+  @apply font-normal text-gray-400 text-sm;
 }
 
 .meta-title {

@@ -1,3 +1,6 @@
+// React
+import { useEffect, useState } from 'react'
+
 // Next
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -10,17 +13,65 @@ import Badge from '@/components/Badge'
 import isToday from '@/helpers/isToday'
 
 // Modules
-import { FiEye, FiMail, FiPhoneCall, FiTrash } from 'react-icons/fi'
+import { FiEye, FiMail, FiPhoneCall, FiRefreshCcw, FiToggleRight, FiTrash } from 'react-icons/fi'
 import moment from 'moment'
 import toast from 'react-hot-toast'
 
 const Leads = ({ leads }) => {
-  // Variables
-  const headers = ['Customer', 'Phone', 'Email', 'Type', 'KVM', 'City', 'Date', 'Status', 'Source', 'Quick Actions']
+  // State
+  const [filteredLeads, setFilteredLeads] = useState(leads)
+
+  // Router
+  const router = useRouter()
   
+  // Variables
+  const headers = ['Customer', 'Phone', 'Email', 'Type', 'KVM', 'City', 'Date', 'Status', 'Source', 'Quick Actions', <AddLead />]
+
+  const filter = value => {
+    let array = []
+
+    leads.map(lead => {
+      if(lead.status == value) array.push(lead)
+    })
+
+    setFilteredLeads(array)
+  }
+
+  const resetFilter = () => {
+    setFilteredLeads(leads)
+  }
+
   return (
     <>
-      <AddLead />
+      <div className='bg-gray-200 flex mb-4 p-2 rounded w-full'>
+        <button className='bg-gray-100 px-2 py-1 rounded text-gray-400 text-sm mr-4' onClick={() => resetFilter()}>
+          Show All
+        </button>
+        <button className='bg-pink-100 px-2 py-1 rounded text-pink-400 text-sm mr-4' onClick={() => filter('pending')}>
+          Show Pending
+        </button>
+        <button className='bg-indigo-100 px-2 py-1 rounded text-indigo-400 text-sm mr-4' onClick={() => filter('called')}>
+          Show Called
+        </button>
+        <button className='bg-indigo-100 px-2 py-1 rounded text-indigo-400 text-sm mr-4' onClick={() => filter('quoted')}>
+          Show Quoted
+        </button>
+        <button className='bg-green-100 px-2 py-1 rounded text-green-400 text-sm mr-4' onClick={() => filter('sold')}>
+          Show Sold
+        </button>
+        <button className='bg-green-100 px-2 py-1 rounded text-green-400 text-sm mr-4' onClick={() => filter('booked')}>
+          Show Booked
+        </button>
+        <button className='bg-green-100 px-2 py-1 rounded text-green-400 text-sm mr-4' onClick={() => filter('complete')}>
+          Show Complete
+        </button>
+        <button className='bg-red-100 px-2 py-1 rounded text-red-400 text-sm mr-4' onClick={() => filter('rejected')}>
+          Show Rejected
+        </button>
+        <button className='bg-gray-100 flex items-center px-2 py-1 ml-auto rounded text-gray-400 text-sm' onClick={() => resetFilter()}>
+          <FiRefreshCcw className='h-3 mr-2 w-3' /> Reset Filter
+        </button>
+      </div>
       <table className='bg-white rounded table-auto text-left w-full'>
         <TableHead headers={headers} />
         <tbody className='w-full'>
@@ -32,7 +83,7 @@ const Leads = ({ leads }) => {
               </tr>
             )}
 
-            {leads && leads.map((lead, index) => <TableRow lead={lead} key={index} />)}
+            {filteredLeads && filteredLeads.map((lead, index) => <TableRow lead={lead} key={index} />)}
           </tbody>
       </table>
     </>
@@ -49,7 +100,7 @@ const TableHead = ({ headers }) => {
   )
 }
 
-const TableRow = ({ lead, key }) => {
+const TableRow = ({ lead }) => {
   // Router
   const router = useRouter()
 
@@ -61,7 +112,7 @@ const TableRow = ({ lead, key }) => {
   }
 
   return (
-    <tr key={key}>
+    <tr>
       <td className='p-2'>
         <Link href={`/leads/${lead._id}`}>
           <a className='flex leads-center'>

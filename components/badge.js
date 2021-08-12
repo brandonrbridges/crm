@@ -3,6 +3,15 @@ const Badge = ({ className, text, size, status }) => {
 
   // Colour Switcher based on Status
   switch(status) {
+    case 'accepted': 
+      color = 'green'
+      break
+    case 'booked':
+      color = 'green'
+      break
+    case 'called':
+      color = 'indigo'
+      break
     case 'complete':
       color = 'green'
       break
@@ -11,6 +20,9 @@ const Badge = ({ className, text, size, status }) => {
       break
     case 'pending':
       color = 'pink'
+      break
+    case 'rejected':
+      color = 'red'
       break
     case 'quoted':
       color = 'indigo'
