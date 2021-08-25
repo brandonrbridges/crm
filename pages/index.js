@@ -66,10 +66,10 @@ const NewLeadsWidget = ({ data }) => {
     if(isToday(lead.creation_date)) {
       leadsToday++
 
-      if(lead.status == 'pending') leadsPending++
+      if(lead.status == 'new') leadsPending++
       if(lead.status == 'quoted' ) leadsQuoted++
 
-      if(lead.status !== 'pending') {
+      if(lead.status !== 'new') {
         leadsQuoteTotal += (lead.quote.service + lead.quote.extra)
       }
     }
@@ -101,13 +101,13 @@ const TodaysSalesWidget = ({ data }) => {
   let leadsSaleTotal = 0
 
   data.leads.map((lead) => {
-    if(isToday(lead.creation_date) && lead.status == 'sold') {
+    if(isToday(lead.creation_date) && lead.status == 'accepted') {
       soldToday++
 
       leadsSaleTotal += (lead.sale.service + lead.sale.extra)
     }
 
-    if(wasYesterday(lead.creation_date) && lead.status == 'sold') soldYesterday++
+    if(wasYesterday(lead.creation_date) && lead.status == 'accepted') soldYesterday++
   })
 
   return (
@@ -132,13 +132,13 @@ const MonthlySalesWidget = ({ data }) => {
   let leadsSaleTotal = 0
 
   data.leads.map((lead) => {
-    if(isThisMonth(lead.creation_date) && lead.status == 'sold') {
+    if(isThisMonth(lead.creation_date) && lead.status == 'accepted') {
       soldThisMonth++
 
       leadsSaleTotal += (lead.sale.service + lead.sale.extra)
     }
 
-    if(wasLastMonth(lead.creation_date) && lead.status == 'sold') soldLastMonth++
+    if(wasLastMonth(lead.creation_date) && lead.status == 'accepted') soldLastMonth++
   })
   
   return (
@@ -162,7 +162,7 @@ const MonthlyGrossProfitWidget = ({ data }) => {
   let revenueThisMonth = 0, revenueLastMonth = 0
 
   data.leads.map((lead) => {
-    if(lead.status !== 'pending' && lead.status !== 'quoted') {
+    if(lead.status !== 'new' && lead.status !== 'quoted') {
       if(isThisMonth(lead.creation_date)) revenueThisMonth += lead.sale.service - ((lead.sale.service / 2) + lead.sale.extra)
       if(wasLastMonth(lead.creation_date)) revenueLastMonth += lead.sale.service - ((lead.sale.service / 2) + lead.sale.extra)
     }
@@ -190,18 +190,21 @@ const NetProfitWidget = ({ data }) => {
   
   data.leads.map((lead) => {
     const date = new Date(lead.creation_date)
-    if(date.getMonth() == 0) january += calculateNetProfit(lead)
-    if(date.getMonth() == 1) february += calculateNetProfit(lead)
-    if(date.getMonth() == 2) march += calculateNetProfit(lead)
-    if(date.getMonth() == 3) april += calculateNetProfit(lead)
-    if(date.getMonth() == 4) may += calculateNetProfit(lead)
-    if(date.getMonth() == 5) june += calculateNetProfit(lead)
-    if(date.getMonth() == 6) july += calculateNetProfit(lead)
-    if(date.getMonth() == 7) august += calculateNetProfit(lead)
-    if(date.getMonth() == 8) september += calculateNetProfit(lead)
-    if(date.getMonth() == 9) october += calculateNetProfit(lead)
-    if(date.getMonth() == 10) november += calculateNetProfit(lead)
-    if(date.getMonth() == 11) december += calculateNetProfit(lead)
+
+    if(lead.sale.service && lead.sale.extra) {
+      if(date.getMonth() == 0) january += calculateNetProfit(lead)
+      if(date.getMonth() == 1) february += calculateNetProfit(lead)
+      if(date.getMonth() == 2) march += calculateNetProfit(lead)
+      if(date.getMonth() == 3) april += calculateNetProfit(lead)
+      if(date.getMonth() == 4) may += calculateNetProfit(lead)
+      if(date.getMonth() == 5) june += calculateNetProfit(lead)
+      if(date.getMonth() == 6) july += calculateNetProfit(lead)
+      if(date.getMonth() == 7) august += calculateNetProfit(lead)
+      if(date.getMonth() == 8) september += calculateNetProfit(lead)
+      if(date.getMonth() == 9) october += calculateNetProfit(lead)
+      if(date.getMonth() == 10) november += calculateNetProfit(lead)
+      if(date.getMonth() == 11) december += calculateNetProfit(lead)
+    }
   })
   
   const state = {

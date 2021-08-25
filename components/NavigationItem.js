@@ -3,8 +3,10 @@ import Link from 'next/link'
 
 // Modules
 import { 
+  FiArchive,
   FiBell, 
   FiCalendar, 
+  FiCheckCircle,
   FiFolder, 
   FiLogOut, 
   FiMoon, 
@@ -13,13 +15,16 @@ import {
   FiSettings, 
   FiSpeaker, 
   FiSun, 
-  FiUsers 
+  FiUsers,
+  FiXCircle 
 } from 'react-icons/fi'
 
 // Variables
 const icons = {
+  FiArchive,
   FiBell,
   FiCalendar,
+  FiCheckCircle,
   FiFolder,
   FiLogOut,
   FiMoon,
@@ -28,7 +33,8 @@ const icons = {
   FiSettings,
   FiSpeaker,
   FiSun,
-  FiUsers
+  FiUsers,
+  FiXCircle
 }
 
 const NavItem = ({ icon, path }) => {

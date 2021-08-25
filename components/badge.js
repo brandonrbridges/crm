@@ -12,23 +12,14 @@ const Badge = ({ className, text, size, status }) => {
     case 'called':
       color = 'indigo'
       break
-    case 'complete':
-      color = 'green'
-      break
     case 'new':
       color = 'green'
-      break
-    case 'pending':
-      color = 'pink'
       break
     case 'rejected':
       color = 'red'
       break
     case 'quoted':
       color = 'indigo'
-      break
-    case 'sold':
-      color = 'green'
       break
     default:
       color = 'gray'

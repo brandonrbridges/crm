@@ -1,6 +1,10 @@
 import mongoose, { Schema } from 'mongoose'
 
 const schema = new Schema({
+  archived: {
+    default: false,
+    type: Boolean
+  },
   city: String,
   creation_date: {
     default: Date.now,
@@ -15,16 +19,28 @@ const schema = new Schema({
   kvm: String,
   message: String,
   quote: {
-    service: Number,
-    extra: Number
+    service: {
+      default: 0,
+      type: Number
+    },
+    extra: {
+      default: 0,
+      type: Number
+    }
   },
   sale: {
-    service: Number,
-    extra: Number
+    service: {
+      default: 0,
+      type: Number
+    },
+    extra: {
+      default: 0,
+      type: Number
+    }
   },
   source: String,
   status: {
-    default: 'pending',
+    default: 'new',
     type: String
   },
   type: String,

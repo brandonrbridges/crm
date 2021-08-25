@@ -56,7 +56,7 @@ export default async (req, res) => {
             $set: {
               'sale.service': req.body.sale.service,
               'sale.extra': req.body.sale.extra,
-              status: 'sold'
+              status: 'accepted'
             }
           },
           { 

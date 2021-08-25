@@ -25,6 +25,9 @@ const Dashboard = ({ children, title }) => {
           <div className='gap-y-4 grid grid-cols-1'>
             <NavItem icon='FiSpeaker' path='/' />
             <NavItem icon='FiFolder' path='/leads' />
+            <NavItem icon='FiCheckCircle' path='/leads/accepted' />
+            <NavItem icon='FiXCircle' path='/leads/rejected' />
+            <NavItem icon='FiArchive' path='/leads/archive' />
             <NavItem icon='FiUsers' path='/customers' />
             <NavItem icon='FiCalendar' path='/calendar' />
             <NavItem icon='FiPieChart' path='/analytics' />

@@ -13,11 +13,11 @@ import Badge from '@/components/Badge'
 import isToday from '@/helpers/isToday'
 
 // Modules
-import { FiEye, FiMail, FiPhoneCall, FiRefreshCcw, FiToggleRight, FiTrash } from 'react-icons/fi'
+import { FiCheckCircle, FiFileText, FiEye, FiPhoneCall, FiRefreshCcw, FiXCircle } from 'react-icons/fi'
 import moment from 'moment'
 import toast from 'react-hot-toast'
 
-const Leads = ({ leads }) => {
+const Leads = ({ leads, prefilter, hideFilters }) => {
   // State
   const [filteredLeads, setFilteredLeads] = useState(leads)
 
@@ -25,7 +25,7 @@ const Leads = ({ leads }) => {
   const router = useRouter()
   
   // Variables
-  const headers = ['Customer', 'Phone', 'Email', 'Type', 'KVM', 'City', 'Date', 'Status', 'Source', 'Quick Actions', <AddLead />]
+  const headers = ['Customer', 'Phone', 'Email', 'Source', 'Type', 'KVM', 'City', 'Date', 'Status', 'Quick Actions', <AddLead />]
 
   const filter = value => {
     let array = []
@@ -41,37 +41,41 @@ const Leads = ({ leads }) => {
     setFilteredLeads(leads)
   }
 
+  useEffect(() => {
+    if(prefilter) {
+      filter(prefilter)
+    }
+  })
+
   return (
     <>
-      <div className='bg-gray-200 flex mb-4 p-2 rounded w-full'>
-        <button className='bg-gray-100 px-2 py-1 rounded text-gray-400 text-sm mr-4' onClick={() => resetFilter()}>
-          Show All
-        </button>
-        <button className='bg-pink-100 px-2 py-1 rounded text-pink-400 text-sm mr-4' onClick={() => filter('pending')}>
-          Show Pending
-        </button>
-        <button className='bg-indigo-100 px-2 py-1 rounded text-indigo-400 text-sm mr-4' onClick={() => filter('called')}>
-          Show Called
-        </button>
-        <button className='bg-indigo-100 px-2 py-1 rounded text-indigo-400 text-sm mr-4' onClick={() => filter('quoted')}>
-          Show Quoted
-        </button>
-        <button className='bg-green-100 px-2 py-1 rounded text-green-400 text-sm mr-4' onClick={() => filter('sold')}>
-          Show Sold
-        </button>
-        <button className='bg-green-100 px-2 py-1 rounded text-green-400 text-sm mr-4' onClick={() => filter('booked')}>
-          Show Booked
-        </button>
-        <button className='bg-green-100 px-2 py-1 rounded text-green-400 text-sm mr-4' onClick={() => filter('complete')}>
-          Show Complete
-        </button>
-        <button className='bg-red-100 px-2 py-1 rounded text-red-400 text-sm mr-4' onClick={() => filter('rejected')}>
-          Show Rejected
-        </button>
-        <button className='bg-gray-100 flex items-center px-2 py-1 ml-auto rounded text-gray-400 text-sm' onClick={() => resetFilter()}>
-          <FiRefreshCcw className='h-3 mr-2 w-3' /> Reset Filter
-        </button>
-      </div>
+      {!hideFilters && (
+        <div className='bg-gray-200 flex mb-4 p-2 rounded w-full'>
+          <button className='bg-gray-100 px-2 py-1 rounded text-gray-400 text-sm mr-4' onClick={() => resetFilter()}>
+            All
+          </button>
+          <button className='bg-green-100 px-2 py-1 rounded text-green-400 text-sm mr-4' onClick={() => filter('new')}>
+            New
+          </button>
+          <button className='bg-indigo-100 px-2 py-1 rounded text-indigo-400 text-sm mr-4' onClick={() => filter('called')}>
+            Called
+          </button>
+          <button className='bg-yellow-400 px-2 py-1 rounded text-yellow-50 text-sm mr-4' onClick={() => filter('quoted')}>
+            Quoted
+          </button>
+          {/* 
+          <button className='bg-green-100 px-2 py-1 rounded text-green-400 text-sm mr-4' onClick={() => filter('accepted')}>
+            Accepted
+          </button> 
+          <button className='bg-red-100 px-2 py-1 rounded text-red-400 text-sm mr-4' onClick={() => filter('rejected')}>
+            Rejected
+          </button>
+          */}
+          <button className='bg-gray-100 flex items-center px-2 py-1 ml-auto rounded text-gray-400 text-sm' onClick={() => resetFilter()}>
+            <FiRefreshCcw className='h-3 mr-2 w-3' /> Reset Filter
+          </button>
+        </div>
+      )}
       <table className='bg-white rounded table-auto text-left w-full'>
         <TableHead headers={headers} />
         <tbody className='w-full'>
@@ -104,6 +108,23 @@ const TableRow = ({ lead }) => {
   // Router
   const router = useRouter()
 
+  // Handle status change
+  const handleStatusChange = async (newValue) => {
+    let _id = (router.query._id ? router.query._id : lead._id)
+
+    await fetch(`/api/leads/${_id}`, {
+      body: JSON.stringify({
+        status: newValue
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'PUT'
+    })
+    .then(() => router.push(window.location.pathname)) // Soft Refresh
+    .then(() => toast.success('Status has been updated successfully.')) // Toast
+  }
+
   // Handle deletion
   const handleDelete = async (_id) => {
     await fetch(`/api/leads?_id=${_id}`, { method: 'DELETE' })
@@ -132,6 +153,9 @@ const TableRow = ({ lead }) => {
           {lead.customer.email}
         </a>
       </td>
+      <td className='p-2'>
+        {lead.source}
+      </td>
       <td className='capitalize p-2'>{lead.type}</td>
       <td className='p-2'>{lead.kvm} kvm</td>
       <td className='capitalize p-2'>{lead.city}</td>
@@ -140,27 +164,23 @@ const TableRow = ({ lead }) => {
         <span className='text-gray-400 text-xs'>({moment(lead.creation_date).fromNow()})</span>
       </td>
       <td className='p-2'><Badge size='sm' status={lead.status} text={lead.status} /></td>
-      <td className='p-2'>
-        {lead.source}
-      </td>
       <td className='flex p-2'>
         <Link href={`/leads/${lead._id}`}>
-          <a className='inline-block bg-blue-100 hover:bg-blue-300 mr-2 p-2 rounded-full hover:text-white'>
+          <a className='inline-block bg-pink-100 hover:bg-pink-300 p-2 rounded-full hover:text-white'>
             <FiEye className='h-4 w-4' />
           </a>
         </Link>
-        {lead.customer.phone && (
-          <a href={`tel:${lead.customer.phone}`} className='inline-block bg-purple-100 hover:bg-purple-300 mr-2 p-2 rounded-full hover:text-white'>
-            <FiPhoneCall className='h-4 w-4' />
-          </a>
-        )}
-        {lead.customer.email && (
-          <a href={`mailto:${lead.customer.email}`} className='inline-block bg-purple-100 hover:bg-purple-300 mr-2 p-2 rounded-full hover:text-white'>
-            <FiMail className='h-4 w-4' />
-          </a>
-        )}
-        <button onClick={() => handleDelete(lead._id)} className='inline-block bg-red-100 hover:bg-red-300 p-2 rounded-full hover:text-white'>
-          <FiTrash className='h-4 w-4' />
+        <button onClick={() => handleStatusChange('called')} className='bg-blue-100 hover:bg-blue-300 group inline-block ml-2 p-2 relative rounded-full hover:text-white'>
+          <FiPhoneCall className='h-4 w-4' />
+        </button>
+        <button onClick={() => handleStatusChange('quoted')} className='bg-blue-100 hover:bg-blue-300 group inline-block ml-2 p-2 relative rounded-full hover:text-white'>
+          <FiFileText className='h-4 w-4' />
+        </button>
+        <button onClick={() => handleStatusChange('accepted')} className='bg-green-100 hover:bg-green-300 group inline-block ml-2 p-2 relative rounded-full hover:text-white'>
+          <FiCheckCircle className='h-4 w-4' />
+        </button>
+        <button onClick={() => handleStatusChange('rejected')} className='bg-red-100 hover:bg-red-300 group inline-block ml-2 p-2 relative rounded-full hover:text-white'>
+          <FiXCircle className='h-4 w-4' />
         </button>
       </td>
     </tr>

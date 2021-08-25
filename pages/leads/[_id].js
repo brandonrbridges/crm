@@ -9,6 +9,7 @@ import DashboardLayout from '@/layouts/Dashboard'
 
 // Components
 import Badge from '@/components/Badge'
+import ChangeStatusForm from '@/components/ChangeStatusForm'
 import CustomerWidget from '@/components/CustomerProfile'
 import Widget from '@/components/Widget'
 
@@ -29,6 +30,23 @@ const Page = ({ customer, lead }) => {
   const [editSale, setEditSale] = useState(false)
 
   // Handle deletion
+  const handleArchive = async () => {
+    let _id = (router.query._id ? router.query._id : lead._id)
+
+    await fetch(`/api/leads/${_id}`, {
+      body: JSON.stringify({
+        archive: true
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'PUT'
+    })
+    .then(() => router.push(window.location.pathname)) // Soft Refresh
+    .then(() => toast.success('Status has been updated successfully.')) // Toast
+  }
+
+  // Handle deletion
   const handleDelete = async () => {
     await fetch(`/api/leads?_id=${router.query._id}`, { method: 'DELETE' })
     .then(() => router.push('/leads'))
@@ -41,6 +59,7 @@ const Page = ({ customer, lead }) => {
         <div>
           <Widget>
             {isToday(lead.creation_date) && <div className='mb-2 text-center w-full'><Badge className='mx-auto' size='xs' status='new' text='New Lead' /></div>}
+            {lead.archive && <div className='mb-2 text-center w-full'><Badge className='mx-auto' size='xs' text='Archive' /></div>}
 
             <h1 className='flex font-bold items-center justify-center mb-4 text-3xl text-center'>Lead</h1>
 
@@ -97,6 +116,9 @@ const Page = ({ customer, lead }) => {
           <Widget margin='mt-4'>
             <p className='meta-title mb-4'>Quick Actions</p>
             <div className='gap-y-4 grid grid-cols-1'>
+              <button onClick={() => handleArchive()} className='border py-1 rounded w-full'>
+                Archive
+              </button>
               <button onClick={() => handleDelete()} className='border py-1 rounded w-full'>
                 Delete
               </button>
@@ -112,15 +134,7 @@ const Page = ({ customer, lead }) => {
                 <p>Service Cost: {lead.quote.service} kr</p>
                 <p>Extra Cost: {lead.quote.extra} kr</p>
 
-                {editQuote && (
-                  <>
-                    <form onSubmit={handleQuoteValue} className='flex mt-4 whitespace-nowrap'>
-                      <input type='number' name='quote_value' className='p-2 rounded-r-none w-full' />
-                      <button type='submit' className='bg-gray-300 px-2 rounded-l-none'>Update Quote</button>
-                    </form>
-                    <p className='mt-4 text-gray-400 text-sm'>This will change the value of your quote.</p>
-                  </>
-                )}
+                {editQuote && <AddQuoteForm lead={lead} />}
 
                 <button type='button' onClick={() => setEditQuote(!editQuote)} className='absolute text-gray-400 hover:text-black top-12 right-12'>
                   <FiEdit />
@@ -134,8 +148,8 @@ const Page = ({ customer, lead }) => {
             {lead.sale && (
               <>
                 <p className='font-bold text-3xl'>{lead.sale.service + lead.sale.extra} kr</p>
-                {lead.sale.service && <p>Service Cost: {lead.sale.service} kr (incl. RUT)</p>}
-                {lead.sale.extra && <p>Extra Cost: {lead.sale.extra} kr</p>}
+                <p>Service Cost: {lead.sale.service} kr (incl. RUT)</p>
+                <p>Extra Cost: {lead.sale.extra} kr</p>
 
                 {editSale && <AddSaleForm lead={lead} />}
 
@@ -162,7 +176,7 @@ const AddQuoteForm = () => {
   const handleQuoteValue = async (e) => {
     e.preventDefault() 
 
-    const res = await fetch(`/api/leads/${router.query._id}`, {
+    await fetch(`/api/leads/${router.query._id}`, {
       body: JSON.stringify({
         quote: {
           service: e.target.quote_service.value,
@@ -224,44 +238,6 @@ const AddSaleForm = ({ lead }) => {
       </form>
       <p className='mt-4 text-gray-400 text-sm'>If no value is entered, the quote values will be used.</p>
     </>
-  )
-}
-
-const ChangeStatusForm = ({ lead }) => {
-  // Router
-  const router = useRouter()
-
-  const [value, setValue] = useState(lead.status)
-
-  const options = ['called', 'quoted', 'accepted', 'sold', 'booked', 'complete', 'rejected']
-
-  // Handle status change
-  const handleStatusChange = async (newValue) => {
-    console.log(newValue)
-
-    setValue(newValue)
-
-    const res = await fetch(`/api/leads/${router.query._id}`, {
-      body: JSON.stringify({
-        status: newValue
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'PUT'
-    })
-    .then(() => router.push(window.location.pathname)) // Soft Refresh
-    .then(() => toast.success('Status has been updated successfully.')) // Toast
-  }
-  
-  return (
-    <form>
-      <label>Edit Status</label>
-      <select name='status' value={value} onChange={e => handleStatusChange(e.currentTarget.value)} className='capitalize'>
-        <option hidden>Select</option>
-        {options.map(option => <option value={option} defaultChecked={(value == option ? true : false)} className='capitalize'>{option}</option>)}
-      </select>
-    </form>
   )
 }
 
