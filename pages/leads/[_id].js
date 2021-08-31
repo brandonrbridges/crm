@@ -17,7 +17,7 @@ import Widget from '@/components/Widget'
 import isToday from '@/helpers/isToday'
 
 // Modules
-import { FiEdit } from 'react-icons/fi'
+import { FiCircle, FiEdit } from 'react-icons/fi'
 import moment from 'moment'
 import toast from 'react-hot-toast'
 
@@ -116,11 +116,13 @@ const Page = ({ customer, lead }) => {
           <Widget margin='mt-4'>
             <p className='meta-title mb-4'>Quick Actions</p>
             <div className='gap-y-4 grid grid-cols-1'>
+              {/*  
               <button onClick={() => handleArchive()} className='border py-1 rounded w-full'>
                 Archive
               </button>
-              <button onClick={() => handleDelete()} className='border py-1 rounded w-full'>
-                Delete
+              */}
+              <button onClick={() => handleDelete()} className='bg-red-100 hover:bg-red-500 py-1 rounded text-red-500 hover:text-white transition-all w-full'>
+                Delete Lead
               </button>
               <ChangeStatusForm lead={lead} />
             </div>
@@ -162,7 +164,13 @@ const Page = ({ customer, lead }) => {
             {!lead.sale && <AddSaleForm lead={lead} />}
           </Widget>
         </div>
-        
+        <div>
+          <Widget title='Activity Log'>
+            <ul>
+              <li className='flex items-center'><FiCircle className='h-4 mr-2 text-green-500 w-4' /> Lead created <span className='ml-4 text-gray-400 text-sm'>{moment(lead.creation_date).fromNow()}</span></li>
+            </ul>
+          </Widget>
+        </div>
       </div>
     </DashboardLayout>
   )

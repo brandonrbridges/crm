@@ -1,10 +1,17 @@
+// Next Auth
 import { getSession } from 'next-auth/client'
 
+// Helpers
 import dbConnect from '@/helpers/dbConnect'
 import NotifyByEmail from '@/helpers/notifyByEmail'
 
+// Models
 import Lead from '@/models/Lead'
 import Customer from '@/models/Customer'
+
+// Modules
+import { initNotifications, notify } from 'browser-notification'
+
 
 export default async (req, res) => {
   const user = await getSession({ req })
@@ -87,6 +94,10 @@ export default async (req, res) => {
     // If no Customer, create one
     if(!customer)
       customer = await new Customer({ name, email, phone }).save()
+    else 
+      customer = await Customer.findOneAndUpdate({ email }, { $set: { name, phone } }, { new: true })
+
+    console.log(customer)
 
     // Add Lead to Database
     await new Lead(
@@ -106,6 +117,17 @@ export default async (req, res) => {
     .then(async (lead) => {
       // Push Lead ID to Customer's Records
       await Customer.findOneAndUpdate({ _id: customer._id }, { $push: { lead_ids: lead._id } }, { new: true })
+
+      // Send Browser Notification
+      // initNotifications({ timeout: 3000, cooldown: 0 }).then(available => {
+      //   notify('You have a new lead!', { body: `${customer.name} submitted a lead from ${lead.source}.`})
+
+      //   if(available) {
+      //     console.log('notification sent')
+      //   } else {
+      //     console.log('notification not sent')
+      //   }
+      // })
 
       // Send email notification
       NotifyByEmail(lead)

@@ -19,14 +19,14 @@ const Badge = ({ className, text, size, status }) => {
       color = 'red'
       break
     case 'quoted':
-      color = 'indigo'
+      color = 'yellow'
       break
     default:
       color = 'gray'
   }
 
   return (
-    <div className={`${className} bg-${color}-100 capitalize font-bold inline-block px-4 py-1 rounded text-center text-${color}-400 text-${size}`}>
+    <div className={`${className} bg-${color}-100 capitalize font-bold inline-block px-4 py-1 rounded-full text-center text-${color}-400 text-${size}`}>
       {text}
     </div>
   )

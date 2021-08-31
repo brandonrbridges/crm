@@ -13,7 +13,7 @@ const ChangeStatusForm = ({ lead }) => {
 
   const [value, setValue] = useState(lead.status)
 
-  const options = ['called', 'quoted', 'accepted', 'rejected', 'booked']
+  const options = ['new', 'called', 'quoted', 'accepted', 'rejected', 'booked']
 
   // Handle status change
   const handleStatusChange = async (newValue) => {

@@ -9,8 +9,6 @@ import { useRouter } from 'next/router'
 import AddLead from '@/components/AddLead'
 import Badge from '@/components/Badge'
 
-// Helpers
-import isToday from '@/helpers/isToday'
 
 // Modules
 import { FiCheckCircle, FiFileText, FiEye, FiPhoneCall, FiRefreshCcw, FiXCircle } from 'react-icons/fi'
@@ -20,12 +18,10 @@ import toast from 'react-hot-toast'
 const Leads = ({ leads, prefilter, hideFilters }) => {
   // State
   const [filteredLeads, setFilteredLeads] = useState(leads)
+  const [filterText, setFilterText] = useState(null)
 
-  // Router
-  const router = useRouter()
-  
   // Variables
-  const headers = ['Customer', 'Phone', 'Email', 'Source', 'Type', 'KVM', 'City', 'Date', 'Status', 'Quick Actions', <AddLead />]
+  const headers = ['Status', 'Customer', 'Phone', 'Email', 'Source', 'Type', 'KVM', 'City', 'Date', 'Quick Actions', <AddLead />]
 
   const filter = value => {
     let array = []
@@ -34,10 +30,12 @@ const Leads = ({ leads, prefilter, hideFilters }) => {
       if(lead.status == value) array.push(lead)
     })
 
+    setFilterText(value)
     setFilteredLeads(array)
   }
 
   const resetFilter = () => {
+    setFilterText(null)
     setFilteredLeads(leads)
   }
 
@@ -50,38 +48,28 @@ const Leads = ({ leads, prefilter, hideFilters }) => {
   return (
     <>
       {!hideFilters && (
-        <div className='bg-gray-200 flex mb-4 p-2 rounded w-full'>
-          <button className='bg-gray-100 px-2 py-1 rounded text-gray-400 text-sm mr-4' onClick={() => resetFilter()}>
-            All
-          </button>
-          <button className='bg-green-100 px-2 py-1 rounded text-green-400 text-sm mr-4' onClick={() => filter('new')}>
-            New
-          </button>
-          <button className='bg-indigo-100 px-2 py-1 rounded text-indigo-400 text-sm mr-4' onClick={() => filter('called')}>
-            Called
-          </button>
-          <button className='bg-yellow-400 px-2 py-1 rounded text-yellow-50 text-sm mr-4' onClick={() => filter('quoted')}>
-            Quoted
-          </button>
-          {/* 
-          <button className='bg-green-100 px-2 py-1 rounded text-green-400 text-sm mr-4' onClick={() => filter('accepted')}>
-            Accepted
-          </button> 
-          <button className='bg-red-100 px-2 py-1 rounded text-red-400 text-sm mr-4' onClick={() => filter('rejected')}>
-            Rejected
-          </button>
-          */}
-          <button className='bg-gray-100 flex items-center px-2 py-1 ml-auto rounded text-gray-400 text-sm' onClick={() => resetFilter()}>
+        <div className='bg-white flex mb-4 p-2 rounded w-full'>
+          <button className='bg-gray-100 hover:bg-red-400 flex items-center px-4 py-1 rounded-full text-gray-500 hover:text-white transition-all text-sm mr-4' onClick={() => resetFilter()}>
             <FiRefreshCcw className='h-3 mr-2 w-3' /> Reset Filter
           </button>
+          <button className={`${filterText == 'new' || filterText == null ? 'bg-green-100 text-green-400' : filterText !== null ? 'bg-transparent border-green-300 text-green-400' : ''} border hover:bg-green-300 border-transparent px-4 py-1 rounded-full hover:text-white text-sm transition-all mr-4`} onClick={() => filter('new')}>
+            New
+          </button>
+          <button className={`${filterText == 'called' || filterText == null ? 'bg-indigo-100 text-indigo-400' : filterText !== null ? 'bg-transparent border-indigo-300 text-indigo-400' : ''} border hover:bg-indigo-300 border-transparent px-4 py-1 rounded-full hover:text-white text-sm transition-all mr-4`} onClick={() => filter('called')}>
+            Called
+          </button>
+          <button className={`${filterText == 'quoted' || filterText == null ? 'bg-yellow-100 text-yellow-400' : filterText !== null ? 'bg-transparent border-yellow-300 text-yellow-400' : ''} border hover:bg-yellow-300 border-transparent px-4 py-1 rounded-full hover:text-white text-sm transition-all mr-4`} onClick={() => filter('quoted')}>
+            Quoted
+          </button>
+          
         </div>
       )}
-      <table className='bg-white rounded table-auto text-left w-full'>
+      <table className='table-auto'>
         <TableHead headers={headers} />
         <tbody className='w-full'>
             {!leads && (
               <tr>
-                <td className='p-2 text-gray-400'>
+                <td className=' text-gray-400'>
                   No Leads found
                 </td>
               </tr>
@@ -97,7 +85,7 @@ const Leads = ({ leads, prefilter, hideFilters }) => {
 const TableHead = ({ headers }) => {
   return (
     <thead>
-      <tr className='bg-gray-100'>
+      <tr>
         {headers.map((header, index) => <th key={index} className='px-2 py-4'>{header}</th>)}
       </tr>
     </thead>
@@ -125,61 +113,50 @@ const TableRow = ({ lead }) => {
     .then(() => toast.success('Status has been updated successfully.')) // Toast
   }
 
-  // Handle deletion
-  const handleDelete = async (_id) => {
-    await fetch(`/api/leads?_id=${_id}`, { method: 'DELETE' })
-    .then(() => router.push('/leads'))
-    .then(() => toast.success('Lead has been deleted successfully.'))
-  }
-
   return (
     <tr>
-      <td className='p-2'>
-        <Link href={`/leads/${lead._id}`}>
-          <a className='flex leads-center'>
-            {isToday(lead.creation_date) && <Badge className='mr-1' size='xs' status='new' text='New' />}
-            {(lead.customer.email == 'brandon@visually.digital' ? <Badge className='mr-1' size='xs' text='Developer' /> : '')}
-            {lead.customer.name}
-          </a>
-        </Link>
+      <td>
+        <Badge size='sm' status={lead.status} text={lead.status} className='w-full' />
+        </td>
+      <td>
+        <Link href={`/leads/${lead._id}`}><a className='flex leads-center'>{lead.customer.name}</a></Link>
       </td>
-      <td className='p-2'>
-        <a href={`tel:${lead.customer.phone}`}>
-          {lead.customer.phone}
+      <td>
+        <a href={lead.customer.phone ? `tel:${lead.customer.phone}` : ''}>
+          {lead.customer.phone ? lead.customer.phone : <FiXCircle className='mr-2 text-gray-400' />}
         </a>
       </td>
-      <td className='p-2'>
-        <a href={`mailto:${lead.customer.email}`}>
-          {lead.customer.email}
+      <td>
+        <a href={lead.customer.email ? `mailto:${lead.customer.email} ` : ''}>
+          {lead.customer.email ? lead.customer.email : <FiXCircle className='mr-2 text-gray-400' />}
         </a>
       </td>
-      <td className='p-2'>
+      <td>
         {lead.source}
       </td>
-      <td className='capitalize p-2'>{lead.type}</td>
-      <td className='p-2'>{lead.kvm} kvm</td>
-      <td className='capitalize p-2'>{lead.city}</td>
-      <td className='p-2'>
+      <td className='capitalize '>{lead.type}</td>
+      <td>{lead.kvm} kvm</td>
+      <td className='capitalize '>{lead.city}</td>
+      <td>
         {moment(lead.creation_date).format('DD/MM/YYYY')} &nbsp;
         <span className='text-gray-400 text-xs'>({moment(lead.creation_date).fromNow()})</span>
       </td>
-      <td className='p-2'><Badge size='sm' status={lead.status} text={lead.status} /></td>
-      <td className='flex p-2'>
+      <td className='flex'>
         <Link href={`/leads/${lead._id}`}>
-          <a className='inline-block bg-pink-100 hover:bg-pink-300 p-2 rounded-full hover:text-white'>
+          <a className=' bg-pink-100 button hover:bg-pink-300 hover:text-white'>
             <FiEye className='h-4 w-4' />
           </a>
         </Link>
-        <button onClick={() => handleStatusChange('called')} className='bg-blue-100 hover:bg-blue-300 group inline-block ml-2 p-2 relative rounded-full hover:text-white'>
+        <button onClick={() => handleStatusChange('called')} className='bg-blue-100 hover:bg-blue-300 hover:text-white'>
           <FiPhoneCall className='h-4 w-4' />
         </button>
-        <button onClick={() => handleStatusChange('quoted')} className='bg-blue-100 hover:bg-blue-300 group inline-block ml-2 p-2 relative rounded-full hover:text-white'>
+        <button onClick={() => handleStatusChange('quoted')} className='bg-yellow-100 hover:bg-blue-300 hover:text-white'>
           <FiFileText className='h-4 w-4' />
         </button>
-        <button onClick={() => handleStatusChange('accepted')} className='bg-green-100 hover:bg-green-300 group inline-block ml-2 p-2 relative rounded-full hover:text-white'>
+        <button onClick={() => handleStatusChange('accepted')} className='bg-green-100 hover:bg-green-300 hover:text-white'>
           <FiCheckCircle className='h-4 w-4' />
         </button>
-        <button onClick={() => handleStatusChange('rejected')} className='bg-red-100 hover:bg-red-300 group inline-block ml-2 p-2 relative rounded-full hover:text-white'>
+        <button onClick={() => handleStatusChange('rejected')} className='bg-red-100 hover:bg-red-300 hover:text-white'>
           <FiXCircle className='h-4 w-4' />
         </button>
       </td>

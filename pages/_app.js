@@ -1,6 +1,6 @@
 import { Provider } from 'next-auth/client'
 
-import '@/styles/globals.css'
+import '@/styles/style.scss'
 
 function App({ Component, pageProps }) {
   return (

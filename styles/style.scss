@@ -50,16 +50,64 @@ body {
   @apply bg-gray-50;
 }
 
-input,
-select,
-textarea {
-  @apply border px-2 py-1 w-full;
+form {
+  input,
+  select,
+  textarea {
+    @apply border px-2 py-1 w-full;
+  }
+  
+  label {
+    @apply font-normal text-gray-400 text-sm;
+  }
 }
 
-label {
-  @apply font-normal text-gray-400 text-sm;
-}
 
 .meta-title {
   @apply font-bold text-gray-400 uppercase text-xs;
+}
+
+table {
+  @apply text-left w-full;
+
+  thead {
+    tr {
+      @apply bg-gray-800 text-white;
+      
+      th {
+        @apply p-2 transition-all;
+
+        &:first-of-type {
+          @apply rounded-tl;
+        }
+
+        &:last-of-type {
+          @apply rounded-tr;
+        }
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      td {
+        @apply p-2;
+
+        button,
+        .button {
+          @apply inline-block mx-2 p-2 relative rounded-full;
+
+          &:last-of-type {
+            @apply mr-0;
+          }
+        }
+      }
+
+      &:hover {
+        td {
+          @apply bg-gray-200;
+        }
+      }
+    }
+  }
 }

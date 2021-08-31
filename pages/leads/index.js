@@ -17,6 +17,14 @@ export async function getServerSideProps(context) {
   const res = await fetch(`${process.env.NEXTAUTH_URL}/api/leads`, options)
   const json = await res.json()
 
+  const leads = []
+
+  json.leads.map(lead => {
+    if(lead.status !== 'accepted') {
+      leads.push(lead)
+    }
+  })
+
   if(json.error) {
     return {
       redirect: {
@@ -28,7 +36,7 @@ export async function getServerSideProps(context) {
 
   return {
     props: {
-      leads: json.leads
+      leads
     }
   }
 }

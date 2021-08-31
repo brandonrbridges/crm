@@ -15,5 +15,5 @@ export default NextAuth({
 
       return Promise.resolve(session)
     }
-  }
+  },
 })

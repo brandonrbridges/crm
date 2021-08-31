@@ -7,7 +7,7 @@ import Leads from '@/components/LeadsTable'
 const Page = ({ leads }) => {
   return (
     <DashboardLayout title={`Accepted Leads (${leads.length})`}>
-      <Leads leads={leads} prefilter='accepted' hideFilters />
+      <Leads leads={leads} hideFilters />
     </DashboardLayout>
   )
 }
@@ -16,6 +16,8 @@ export async function getServerSideProps(context) {
   const options = { headers: { cookie: context.req.headers.cookie } }
   const res = await fetch(`${process.env.NEXTAUTH_URL}/api/leads`, options)
   const json = await res.json()
+
+  const leads = []
 
   if(json.error) {
     return {
@@ -26,9 +28,15 @@ export async function getServerSideProps(context) {
     }
   }
 
+  json.leads.map(lead => {
+    if(lead.status === 'accepted') {
+      leads.push(lead)
+    }
+  })
+
   return {
     props: {
-      leads: json.leads
+      leads
     }
   }
 }

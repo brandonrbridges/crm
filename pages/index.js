@@ -28,12 +28,9 @@ const Page = ({ data }) => {
   return (
     <DashboardLayout>
       { session && <h1 className='font-bold mb-4 text-3xl'>Hello, {session.user.name}!</h1>}
-      <div className='flex items-center mb-4'>
-        <h2 className='font-bold text-gray-400'>Dashboard</h2>
-      </div>
-
+      
       <div className='gap-4 grid grid-cols-2'>
-        <div className='gap-4 grid grid-cols-2'>
+        <div className='gap-4 grid md:grid-cols-1'>
           <NewLeadsWidget data={data} />
           <TodaysSalesWidget data={data} />
           <MonthlySalesWidget data={data} />
@@ -42,13 +39,8 @@ const Page = ({ data }) => {
         <NetProfitWidget data={data} />
       </div>
 
-      <div className='flex items-center my-4'>
+      <div className='my-4'>
         <h2 className='font-bold text-gray-400'>Leads</h2>
-        <Link href='/leads'>
-          <a className='hover:bg-gray-600 border border-gray-600 dark:border-gray-400 dark:hover:bg-gray-400 flex items-center ml-auto px-4 py-1 rounded text-sm text-gray-600 hover:text-white dark:text-gray-400 dark:hover:text-white'>
-            View All Leads <FiArrowRightCircle className='h-4 ml-2 w-4' />
-          </a>
-        </Link>
       </div>
 
       <Leads leads={data.leads} />
@@ -86,7 +78,7 @@ const NewLeadsWidget = ({ data }) => {
           <FiCornerRightDown className='h-6 text-green-400 w-6' />
         </div>
       </div>
-      <p className='font-semibold text-4xl dark:text-white'>
+      <p className='font-semibold text-4xl'>
         {leadsToday}
       </p>
       <p className='mt-4 text-gray-400 text-sm'>
@@ -117,7 +109,7 @@ const TodaysSalesWidget = ({ data }) => {
           <FiShoppingBag className='h-6 text-yellow-400 w-6' />
         </div>
       </div>
-      <p className='font-semibold text-4xl dark:text-white'>
+      <p className='font-semibold text-4xl'>
         {leadsSaleTotal} kr
       </p>
       <p className='mt-4 text-gray-400 text-sm'>
@@ -148,7 +140,7 @@ const MonthlySalesWidget = ({ data }) => {
           <FiShoppingCart className='h-6 text-blue-400 w-6' />
         </div>
       </div>
-      <p className='font-semibold text-4xl dark:text-white'>
+      <p className='font-semibold text-4xl'>
         {leadsSaleTotal} kr
       </p>
       <p className='mt-4 text-gray-400 text-sm'>
@@ -175,7 +167,7 @@ const MonthlyGrossProfitWidget = ({ data }) => {
           <FiBarChart className='h-6 text-pink-400 w-6' />
         </div>
       </div>
-      <p className='font-semibold text-4xl dark:text-white'>
+      <p className='font-semibold text-4xl'>
         {revenueThisMonth} kr
       </p>
       <p className='mt-4 text-gray-400 text-sm'>

@@ -37,14 +37,15 @@ const icons = {
   FiXCircle
 }
 
-const NavItem = ({ icon, path }) => {
+const NavItem = ({ icon, name, path }) => {
   // Get Icon
   const SelectedIcon = icons[icon]
   
   return (
     <Link href={path}>
-      <a className='hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center mt-auto px-2 py-2 rounded text-gray-800 dark:text-gray-400 dark:hover:text-white w-full'>
-        <SelectedIcon className='h-5 mx-auto w-5' />
+      <a className='hover:bg-gray-700 flex items-center justify-start mt-auto px-2 py-2 rounded text-gray-400 hover:text-white transition-all w-full'>
+        <SelectedIcon className='h-5 mr-3 w-5' />
+        {name}
       </a>
     </Link>
   )

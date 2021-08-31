@@ -14,7 +14,7 @@ const AddLead = () => {
   
   return (
     <>
-      <button onClick={() => setOpenModal(!openModal)} className='hover:bg-green-400 border border-green-400 dark:border-green-400 dark:hover:bg-gray-400 flex items-center ml-auto px-4 py-1 rounded text-sm text-green-400 hover:text-white dark:text-green-400 dark:hover:text-white'>
+      <button onClick={() => setOpenModal(!openModal)} className='hover:bg-green-400 border border-green-400 flex items-center ml-auto px-4 py-1 rounded text-sm text-green-400 hover:text-white'>
         <FiPlusCircle />
       </button>
 
@@ -82,17 +82,6 @@ const AddLeadForm = () => {
           <input type='tel' name='phone' placeholder='073-8142506' className='w-full' />
         </div>
       </div>
-
-      {/**
-        <div className='my-8 relative'>
-          <hr className='' />
-          <p className='absolute bg-white inline left-1/2 px-4 text-gray-400 transform -translate-x-1/2 -translate-y-1/2'>OR</p>
-        </div>
-        <label>Select a Customer</label>
-        <select>
-          <option>Potato</option>
-        </select>
-      */}
 
       <hr className='my-8' />
 
