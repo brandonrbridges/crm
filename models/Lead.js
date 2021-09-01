@@ -1,6 +1,10 @@
 import mongoose, { Schema } from 'mongoose'
 
 const schema = new Schema({
+  activity_log: {
+    default: [],
+    type: Array
+  },
   archived: {
     default: false,
     type: Boolean

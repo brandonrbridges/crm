@@ -35,7 +35,7 @@ const Page = ({ customer, lead }) => {
 
     await fetch(`/api/leads/${_id}`, {
       body: JSON.stringify({
-        archive: true
+        archived: true
       }),
       headers: {
         'Content-Type': 'application/json'
@@ -43,7 +43,7 @@ const Page = ({ customer, lead }) => {
       method: 'PUT'
     })
     .then(() => router.push(window.location.pathname)) // Soft Refresh
-    .then(() => toast.success('Status has been updated successfully.')) // Toast
+    .then(() => toast.success('Lead has been archived successfully.')) // Toast
   }
 
   // Handle deletion
@@ -59,7 +59,7 @@ const Page = ({ customer, lead }) => {
         <div>
           <Widget>
             {isToday(lead.creation_date) && <div className='mb-2 text-center w-full'><Badge className='mx-auto' size='xs' status='new' text='New Lead' /></div>}
-            {lead.archive && <div className='mb-2 text-center w-full'><Badge className='mx-auto' size='xs' text='Archive' /></div>}
+            {lead.archived && <div className='mb-2 text-center w-full'><Badge className='mx-auto' size='xs' text='Archived' /></div>}
 
             <h1 className='flex font-bold items-center justify-center mb-4 text-3xl text-center'>Lead</h1>
 
@@ -109,11 +109,11 @@ const Page = ({ customer, lead }) => {
           <Widget margin='mb-4'>
             <p className='meta-title mb-4'>Quick Actions</p>
             <div className='gap-y-4 grid grid-cols-1'>
-              {/*  
-              <button onClick={() => handleArchive()} className='border py-1 rounded w-full'>
+               
+              <button onClick={() => handleArchive()} className='hover:bg-gray-200 border py-1 rounded transition-all w-full'>
                 Archive
-                </button>
-              */}
+              </button>
+             
               <button onClick={() => handleDelete()} className='bg-red-100 hover:bg-red-500 py-1 rounded text-red-500 hover:text-white transition-all w-full'>
                 Delete Lead
               </button>
@@ -166,7 +166,22 @@ const Page = ({ customer, lead }) => {
         <div>
           <Widget title='Activity Log' margin='mb-4'>
             <ul>
-              <li className='flex items-center'><FiCircle className='h-4 mr-2 text-green-500 w-4' /> Lead created <span className='ml-4 text-gray-400 text-sm'>{moment(lead.creation_date).fromNow()}</span></li>
+              <li className='flex items-center'>
+                <FiCircle className='h-4 mr-2 text-green-500 w-4' /> 
+                Lead created 
+                <span className='ml-4 text-gray-400 text-sm'>
+                  {moment(lead.creation_date).fromNow()}
+                </span>
+              </li>
+              {lead.activity_log && lead.activity_log.map((activity, i) => (
+                <li className='flex items-center'>
+                  <FiCircle className='h-4 mr-2 text-gray-500 w-4' /> 
+                  {activity.update}
+                  <span className='ml-4 text-gray-400 text-sm'>
+                    {moment(activity.date).fromNow()}
+                  </span>
+                </li>
+              ))}
             </ul>
           </Widget>
           <Widget title='Booking Date' margin='mb-4'>
@@ -262,10 +277,26 @@ const AddBookingDate = ({ lead }) => {
   // States
   const [date, setDate] = useState(lead.date_booked)
 
-  useEffect(async () => {
+  // useEffect(async () => {
+  //   const res = await fetch(`/api/leads/${router.query._id}`, {
+  //     body: JSON.stringify({
+  //       date_booked: date
+  //     }),
+  //     headers: {
+  //       'Content-Type': 'application/json'
+  //     },
+  //     method: 'PUT'
+  //   })
+  //   .then(() => router.push(window.location.pathname)) // Soft refresh
+  //   .then(() => toast.success('Your Booking Date has been saved.')) // Toast
+  // }, [date])
+  
+  const updateBookingDate = async (value) => {
+    setDate(value)
+    
     const res = await fetch(`/api/leads/${router.query._id}`, {
       body: JSON.stringify({
-        date_booked: date
+        date_booked: value
       }),
       headers: {
         'Content-Type': 'application/json'
@@ -274,13 +305,13 @@ const AddBookingDate = ({ lead }) => {
     })
     .then(() => router.push(window.location.pathname)) // Soft refresh
     .then(() => toast.success('Your Booking Date has been saved.')) // Toast
-  }, [date])
+  }
 
   return (
     <>
       <form>
         <label className='text-gray-400 text-sm'>Booking Date</label>
-        <input type='date' name='date' value={moment(date).format('YYYY-MM-DD')} onChange={e => setDate(e.target.value)} />
+        <input type='date' name='date' value={moment(date).format('YYYY-MM-DD')} onChange={e => updateBookingDate(e.target.value)} />
         {/* <button onClick={() => setDate(undefined)} className='hover:bg-gray-200 border border-gray-200 mt-4 py-2 text-gray-400 hover:text-black text-sm transition-all w-full'>Clear Booking Date</button> */}
       </form>
     </>

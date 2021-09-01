@@ -28,6 +28,28 @@ export default async (req, res) => {
     console.log(req.body)
 
     if(lead) {
+      if(req.body.archived) {
+        await Lead.findOneAndUpdate(
+          {
+            _id
+          },
+          {
+            $set: {
+              archived: true,
+            },
+            $push: {
+              activity_log: {
+                date: Date.now(),
+                update: 'Lead archived'
+              }
+            }
+          },
+          {
+            new: true
+          }
+        )
+      }
+
       if(req.body.quote) {
         await Lead.findOneAndUpdate(
           { 
@@ -38,7 +60,12 @@ export default async (req, res) => {
               'quote.service': req.body.quote.service,
               'quote.extra': req.body.quote.extra,
               status: 'quoted'
-
+            },
+            $push: {
+              activity_log: {
+                date: Date.now(),
+                update: `Quote figures updated`
+              }
             }
           },
           { 
@@ -57,6 +84,12 @@ export default async (req, res) => {
               'sale.service': req.body.sale.service,
               'sale.extra': req.body.sale.extra,
               status: 'accepted'
+            },
+            $push: {
+              activity_log: {
+                date: Date.now(),
+                update: `Sale figures updated`
+              }
             }
           },
           { 
@@ -73,6 +106,12 @@ export default async (req, res) => {
           {
             $set: {
               status: req.body.status
+            },
+            $push: {
+              activity_log: {
+                date: Date.now(),
+                update: `Status changed to ${req.body.status}`
+              }
             }
           },
           {
@@ -90,6 +129,12 @@ export default async (req, res) => {
             $set: {
               date_booked: req.body.date_booked,
               status: 'booked'
+            },
+            $push: {
+              activity_log: {
+                date: Date.now(),
+                update: `Booking date updated`
+              }
             }
           },
           {

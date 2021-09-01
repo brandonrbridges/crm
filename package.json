@@ -12,6 +12,7 @@
     "autoprefixer": "^10.3.1",
     "browser-notification": "^3.0.0",
     "chart.js": "^3.5.0",
+    "fuse.js": "^6.4.6",
     "moment": "^2.29.1",
     "mongodb": "^3.5.9",
     "mongoose": "^5.13.5",

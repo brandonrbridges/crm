@@ -7,6 +7,7 @@ import { getSession, signIn, signOut, useSession } from 'next-auth/client'
 
 // Components
 import NavItem from '@/components/NavigationItem'
+import Search from '@/components/Search'
 
 // Modules
 import { initNotifications } from 'browser-notification'

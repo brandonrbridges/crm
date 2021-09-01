@@ -3,10 +3,12 @@ import DashboardLayout from '@/layouts/Dashboard'
 
 // Components
 import Leads from '@/components/LeadsTable'
+import Search from '@/components/Search'
 
 const Page = ({ leads }) => {
   return (
     <DashboardLayout title={`Leads (${leads.length})`}>
+      <Search items={leads} />
       <Leads leads={leads} />
     </DashboardLayout>
   )
@@ -20,7 +22,7 @@ export async function getServerSideProps(context) {
   const leads = []
 
   json.leads.map(lead => {
-    if(lead.status !== 'accepted') {
+    if(lead.status !== 'accepted' && lead.status !== 'rejected' && lead.archived === false) {
       leads.push(lead)
     }
   })
