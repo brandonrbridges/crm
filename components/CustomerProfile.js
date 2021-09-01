@@ -67,10 +67,10 @@ const CustomerWidget = ({ customer }) => {
             </tr>
             <tr>
               <td className='text-gray-500'>Email</td>
-              <td>
+              <td className='whitespace-pre'>
                 {!editMode ? (
                   <a href={`mailto:${customer.email}`}>
-                    {customer.email}
+                    {(customer.email).substring(0, 24)}..
                   </a>
                 ) : (
                   <input type='email' name='email' placeholder={(customer.email ? customer.email : 'Enter Email')} className='w-full' />

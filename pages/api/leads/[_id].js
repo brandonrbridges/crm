@@ -25,6 +25,8 @@ export default async (req, res) => {
 
     let lead = await Lead.find({ _id }).lean()
 
+    console.log(req.body)
+
     if(lead) {
       if(req.body.quote) {
         await Lead.findOneAndUpdate(
@@ -35,8 +37,6 @@ export default async (req, res) => {
             $set: {
               'quote.service': req.body.quote.service,
               'quote.extra': req.body.quote.extra,
-              'sale.service': null,
-              'sale.extra': null,
               status: 'quoted'
 
             }
@@ -73,6 +73,39 @@ export default async (req, res) => {
           {
             $set: {
               status: req.body.status
+            }
+          },
+          {
+            new: true
+          }
+        )
+      }
+
+      if(req.body.date_booked) {
+        await Lead.findOneAndUpdate(
+          {
+            _id
+          },
+          {
+            $set: {
+              date_booked: req.body.date_booked,
+              status: 'booked'
+            }
+          },
+          {
+            new: true
+          }
+        )
+      }
+
+      if(req.body.notes) {
+        await Lead.findOneAndUpdate(
+          {
+            _id
+          },
+          {
+            $set: {
+              notes: req.body.notes,
             }
           },
           {

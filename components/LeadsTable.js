@@ -119,7 +119,7 @@ const TableRow = ({ lead }) => {
         <Badge size='sm' status={lead.status} text={lead.status} className='w-full' />
         </td>
       <td>
-        <Link href={`/leads/${lead._id}`}><a className='flex leads-center'>{lead.customer.name}</a></Link>
+        <Link href={`/leads/${lead._id}`}><a className='flex leads-center' target='_blank'>{lead.customer.name}</a></Link>
       </td>
       <td>
         <a href={lead.customer.phone ? `tel:${lead.customer.phone}` : ''}>
@@ -143,7 +143,7 @@ const TableRow = ({ lead }) => {
       </td>
       <td className='flex'>
         <Link href={`/leads/${lead._id}`}>
-          <a className=' bg-pink-100 button hover:bg-pink-300 hover:text-white'>
+          <a className=' bg-pink-100 button hover:bg-pink-300 hover:text-white' target='_blank'>
             <FiEye className='h-4 w-4' />
           </a>
         </Link>

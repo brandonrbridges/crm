@@ -27,7 +27,7 @@ const NotifyByEmail = (lead) => {
   const email = {
     from: 'brandon@visually.digital',
     to: `info@${lead.source}`,
-    subject: `Lead från ${lead.source}`,
+    subject: `Offert | ${lead.customer.name} | ${lead.city}`,
     text: text
   }
 

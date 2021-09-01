@@ -234,7 +234,7 @@ const NetProfitWidget = ({ data }) => {
           november,
           december
         ]
-      }
+      },
     ]
   }
 

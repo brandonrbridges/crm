@@ -16,8 +16,10 @@ const schema = new Schema({
     email: String,
     _id: Schema.Types.ObjectId
   },
+  date_booked: Date,
   kvm: String,
   message: String,
+  notes: String,
   quote: {
     service: {
       default: 0,

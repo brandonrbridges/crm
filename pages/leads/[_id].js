@@ -1,5 +1,5 @@
 // React
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 // Next
 import { useRouter } from 'next/router'
@@ -17,7 +17,7 @@ import Widget from '@/components/Widget'
 import isToday from '@/helpers/isToday'
 
 // Modules
-import { FiCircle, FiEdit } from 'react-icons/fi'
+import { FiCircle, FiEdit, FiLoader } from 'react-icons/fi'
 import moment from 'moment'
 import toast from 'react-hot-toast'
 
@@ -98,12 +98,6 @@ const Page = ({ customer, lead }) => {
               </table>
             </div>
 
-            <p className='font-bold mt-4 mb-4 text-gray-400 uppercase text-xs'>Message</p>
-            <div className='border my-4 p-4 rounded'>
-              <p className='text-gray-400 text-sm'>{lead.customer.name} says:</p>
-              <p>{lead.message}</p>
-            </div>
-
             <p className='font-bold mt-4 mb-4 text-gray-400 uppercase text-xs'>Status</p>
             <div className='border my-4 p-4 rounded'>
               <Badge className='w-full' status={lead.status} text={lead.status} />
@@ -112,14 +106,13 @@ const Page = ({ customer, lead }) => {
           </Widget>
         </div>
         <div>
-          <CustomerWidget customer={customer} />
-          <Widget margin='mt-4'>
+          <Widget margin='mb-4'>
             <p className='meta-title mb-4'>Quick Actions</p>
             <div className='gap-y-4 grid grid-cols-1'>
               {/*  
               <button onClick={() => handleArchive()} className='border py-1 rounded w-full'>
                 Archive
-              </button>
+                </button>
               */}
               <button onClick={() => handleDelete()} className='bg-red-100 hover:bg-red-500 py-1 rounded text-red-500 hover:text-white transition-all w-full'>
                 Delete Lead
@@ -127,8 +120,14 @@ const Page = ({ customer, lead }) => {
               <ChangeStatusForm lead={lead} />
             </div>
           </Widget>
+          <CustomerWidget customer={customer} />
         </div>
         <div>
+          {lead.message && (
+            <Widget title={`${lead.customer.name} says:`} margin='mb-4'>
+              <p>{lead.message}</p>
+            </Widget>
+          )}
           <Widget title='Quote' margin='mb-4 relative'>
             {lead.quote && (
               <>
@@ -165,10 +164,17 @@ const Page = ({ customer, lead }) => {
           </Widget>
         </div>
         <div>
-          <Widget title='Activity Log'>
+          <Widget title='Activity Log' margin='mb-4'>
             <ul>
               <li className='flex items-center'><FiCircle className='h-4 mr-2 text-green-500 w-4' /> Lead created <span className='ml-4 text-gray-400 text-sm'>{moment(lead.creation_date).fromNow()}</span></li>
             </ul>
+          </Widget>
+          <Widget title='Booking Date' margin='mb-4'>
+            {lead.bookingDate}
+            <AddBookingDate lead={lead} />
+          </Widget>
+          <Widget title='Internal Notes'>
+            <AddNotes lead={lead} />
           </Widget>
         </div>
       </div>
@@ -245,6 +251,73 @@ const AddSaleForm = ({ lead }) => {
         <button type='submit' className='bg-gray-100 hover:bg-gray-200 p-2 rounded w-full'>Add Sale</button>
       </form>
       <p className='mt-4 text-gray-400 text-sm'>If no value is entered, the quote values will be used.</p>
+    </>
+  )
+}
+
+const AddBookingDate = ({ lead }) => {
+  // Router
+  const router = useRouter()
+
+  // States
+  const [date, setDate] = useState(lead.date_booked)
+
+  useEffect(async () => {
+    const res = await fetch(`/api/leads/${router.query._id}`, {
+      body: JSON.stringify({
+        date_booked: date
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'PUT'
+    })
+    .then(() => router.push(window.location.pathname)) // Soft refresh
+    .then(() => toast.success('Your Booking Date has been saved.')) // Toast
+  }, [date])
+
+  return (
+    <>
+      <form>
+        <label className='text-gray-400 text-sm'>Booking Date</label>
+        <input type='date' name='date' value={moment(date).format('YYYY-MM-DD')} onChange={e => setDate(e.target.value)} />
+        {/* <button onClick={() => setDate(undefined)} className='hover:bg-gray-200 border border-gray-200 mt-4 py-2 text-gray-400 hover:text-black text-sm transition-all w-full'>Clear Booking Date</button> */}
+      </form>
+    </>
+  )
+}
+
+const AddNotes = ({ lead }) => {
+  const router = useRouter()
+
+  const [notes, setNotes] = useState(lead.notes)
+  const [saving, setSaving] = useState(false)
+
+  useEffect(async () => {
+    setSaving(true)
+    
+    const res = await fetch(`/api/leads/${router.query._id}`, {
+      body: JSON.stringify({
+        notes: notes
+      }),
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      method: 'PUT'
+    })
+    .then(() => router.push(window.location.pathname))
+    .then(() => setSaving(false))
+  }, [notes])
+  
+  return (
+    <>
+      <label className='text-gray-400 text-sm'>These are for internal use only.</label>
+      <textarea value={notes} onChange={e => setNotes(e.target.value)} className='border p-2 rounded w-full'></textarea>
+      {saving && (
+        <div className='flex items-center text-sm'>
+          <FiLoader className='animate-spin mr-2' /> Saving..
+        </div>
+      )}
     </>
   )
 }
