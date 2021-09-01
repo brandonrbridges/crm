@@ -77,6 +77,7 @@ const CustomerWidget = ({ customer }) => {
                 )}
               </td>
             </tr>
+            {/*  
             <tr>
               <td className='text-gray-500'>Address</td>
               <td className='text-gray-400'>/</td>
@@ -85,6 +86,7 @@ const CustomerWidget = ({ customer }) => {
               <td className='text-gray-500'>Company</td>
               <td className={customer.company ? '' : 'text-gray-400'}>{customer.company ? customer.company : 'N/A'}</td>
             </tr>
+            */}
           </tbody>
         </table>
       </div>
