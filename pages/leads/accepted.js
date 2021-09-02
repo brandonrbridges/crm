@@ -29,7 +29,7 @@ export async function getServerSideProps(context) {
   }
 
   json.leads.map(lead => {
-    if(lead.status === 'accepted') {
+    if(lead.status === 'accepted' || lead.status === 'booked') {
       leads.push(lead)
     }
   })

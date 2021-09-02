@@ -22,7 +22,7 @@ export async function getServerSideProps(context) {
   const leads = []
 
   json.leads.map(lead => {
-    if(lead.status !== 'accepted' && lead.status !== 'rejected' && lead.archived === false) {
+    if(lead.status !== 'accepted' && lead.status !== 'booked' && lead.status !== 'rejected' && lead.archived === false) {
       leads.push(lead)
     }
   })

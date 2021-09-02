@@ -30,7 +30,7 @@ const Page = ({ data }) => {
       { session && <h1 className='font-bold mb-4 text-3xl'>Hello, {session.user.name}!</h1>}
       
       <div className='gap-4 grid grid-cols-2'>
-        <div className='gap-4 grid md:grid-cols-1'>
+        <div className='gap-4 grid grid-cols-2'>
           <NewLeadsWidget data={data} />
           <TodaysSalesWidget data={data} />
           <MonthlySalesWidget data={data} />
@@ -43,7 +43,7 @@ const Page = ({ data }) => {
         <h2 className='font-bold text-gray-400'>Leads</h2>
       </div>
 
-      <Leads leads={data.leads} />
+      <Leads leads={data.leads} prefilter='new' />
       
     </DashboardLayout>
   )

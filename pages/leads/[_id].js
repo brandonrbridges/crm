@@ -165,11 +165,11 @@ const Page = ({ customer, lead }) => {
         </div>
         <div>
           <Widget title='Activity Log' margin='mb-4'>
-            <ul>
+            <ul className='text-sm'>
               <li className='flex items-center'>
                 <FiCircle className='h-4 mr-2 text-green-500 w-4' /> 
                 Lead created 
-                <span className='ml-4 text-gray-400 text-sm'>
+                <span className='ml-auto text-gray-400 text-xs'>
                   {moment(lead.creation_date).fromNow()}
                 </span>
               </li>
@@ -177,7 +177,7 @@ const Page = ({ customer, lead }) => {
                 <li className='flex items-center'>
                   <FiCircle className='h-4 mr-2 text-gray-500 w-4' /> 
                   {activity.update}
-                  <span className='ml-4 text-gray-400 text-sm'>
+                  <span className='ml-auto text-gray-400 text-xs'>
                     {moment(activity.date).fromNow()}
                   </span>
                 </li>
