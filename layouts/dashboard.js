@@ -1,4 +1,5 @@
 // Next
+import Head from 'next/head'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -24,6 +25,9 @@ const Dashboard = ({ children, title }) => {
 
   return (
     <>
+      <Head>
+        <title>{title && `${title} | `}Madison Avenue CRM</title>
+      </Head>
       <Toaster position='bottom-right' toastOptions={{ duration: 5000 }} />
       <div className='flex h-screen w-full'>
         <div className='bg-gray-900 border-r border-gray-200 fixed flex flex-col h-screen p-4 top-0 transition-all z-20'>

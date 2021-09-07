@@ -35,20 +35,7 @@ const CustomerWidget = ({ customer }) => {
         ({moment(customer.creation_date).fromNow()})
       </p>
 
-      <div className='justify-center gap-4 grid grid-cols-4 my-8'>
-        <div className='col-span-2 text-center'>
-          <a href={`mailto:${customer.email}`} className='inline-block bg-blue-400 hover:bg-blue-500 p-4 rounded-full'>
-            <FiMail className='h-5 w-5 text-white' />
-          </a>
-        </div>
-        <div className='col-span-2 text-center'>
-          <a href={`tel:${customer.phone}`} className='inline-block bg-blue-400 hover:bg-blue-500 p-4 rounded-full'>
-            <FiPhoneCall className='h-5 w-5 text-white' />
-          </a>
-        </div>
-      </div>
-
-      <div className='border my-4 p-4 rounded'>
+      <div className='border mt-4 p-4 rounded'>
         <table className='w-full'>
           <tbody>
             <tr>
@@ -77,16 +64,6 @@ const CustomerWidget = ({ customer }) => {
                 )}
               </td>
             </tr>
-            {/*  
-            <tr>
-              <td className='text-gray-500'>Address</td>
-              <td className='text-gray-400'>/</td>
-            </tr>
-            <tr>
-              <td className='text-gray-500'>Company</td>
-              <td className={customer.company ? '' : 'text-gray-400'}>{customer.company ? customer.company : 'N/A'}</td>
-            </tr>
-            */}
           </tbody>
         </table>
       </div>

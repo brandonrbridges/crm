@@ -5,6 +5,7 @@ const schema = new Schema({
     default: [],
     type: Array
   },
+  address: String,
   archived: {
     default: false,
     type: Boolean
@@ -21,9 +22,13 @@ const schema = new Schema({
     _id: Schema.Types.ObjectId
   },
   date_booked: Date,
+  date_booked_end: Date,
   kvm: String,
+  latitude: String,
+  longitude: String,
   message: String,
   notes: String,
+  postcode: String,
   quote: {
     service: {
       default: 0,

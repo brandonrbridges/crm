@@ -77,7 +77,7 @@ const Leads = ({ leads, prefilter, hideFilters }) => {
               </tr>
             )}
 
-            {filteredLeads && filteredLeads.map((lead, index) => <TableRow lead={lead} key={index} />)}
+            {filteredLeads && filteredLeads.map((lead, i) => <TableRow lead={lead} key={i} />)}
           </tbody>
       </table>
     </>
@@ -88,7 +88,7 @@ const TableHead = ({ headers }) => {
   return (
     <thead>
       <tr>
-        {headers.map((header, index) => <th key={index} className='px-2 py-4'>{header}</th>)}
+        {headers.map((header, i) => <th key={i} className='px-2 py-4'>{header}</th>)}
       </tr>
     </thead>
   )

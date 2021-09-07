@@ -14,7 +14,7 @@ const Login = ({ providers }) => {
   
   return (
     <div className='bg-gray-800 flex flex-col h-screen items-center justify-center w-full'>
-      <p className='font-bold text-2xl text-white'>Welcome to Madison Avenue's CRM</p>
+      <p className='font-bold text-2xl text-white'>Welcome to the Madison Avenue CRM</p>
       <p className='mb-8 text-gray-400'>Please login</p>
       
       <Grid>

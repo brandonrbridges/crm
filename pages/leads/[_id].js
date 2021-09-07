@@ -8,119 +8,73 @@ import { useRouter } from 'next/router'
 import DashboardLayout from '@/layouts/Dashboard'
 
 // Components
+import ArchiveLeadButton from '@/components/ArchiveLeadButton'
 import Badge from '@/components/Badge'
 import ChangeStatusForm from '@/components/ChangeStatusForm'
 import CustomerWidget from '@/components/CustomerProfile'
+import DeleteLeadButton from '@/components/DeleteLeadButton'
+import LeadActivityLog from '@/components/LeadActivityLog'
+import LeadBookingDates from '@/components/LeadBookingDates'
+import LeadInfoTable from '@/components/LeadInfoTable'
+import LeadNotes from '@/components/LeadNotes'
+import LeadQuoteForm from '@/components/LeadQuoteForm'
+import LeadSaleForm from '@/components/LeadSaleForm'
+import UpdateAddressForm from '@/components/UpdateAddressForm'
 import Widget from '@/components/Widget'
 
 // Helpers
 import isToday from '@/helpers/isToday'
 
 // Modules
-import { FiCircle, FiEdit, FiLoader } from 'react-icons/fi'
+import { FiEdit, FiLoader } from 'react-icons/fi'
 import moment from 'moment'
 import toast from 'react-hot-toast'
 
 const Page = ({ customer, lead }) => {
-  // Router
-  const router = useRouter()
-
   // States
   const [editQuote, setEditQuote] = useState(false)
   const [editSale, setEditSale] = useState(false)
-
-  // Handle deletion
-  const handleArchive = async () => {
-    let _id = (router.query._id ? router.query._id : lead._id)
-
-    await fetch(`/api/leads/${_id}`, {
-      body: JSON.stringify({
-        archived: true
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'PUT'
-    })
-    .then(() => router.push(window.location.pathname)) // Soft Refresh
-    .then(() => toast.success('Lead has been archived successfully.')) // Toast
-  }
-
-  // Handle deletion
-  const handleDelete = async () => {
-    await fetch(`/api/leads?_id=${router.query._id}`, { method: 'DELETE' })
-    .then(() => router.push('/leads'))
-    .then(() => toast.success('Lead has been deleted successfully.'))
-  }
 
   return (
     <DashboardLayout>
       <div className='gap-4 grid grid-cols-4 h-auto'>
         <div>
-          <Widget>
+          <Widget margin='mb-4'>
             {isToday(lead.creation_date) && <div className='mb-2 text-center w-full'><Badge className='mx-auto' size='xs' status='new' text='New Lead' /></div>}
             {lead.archived && <div className='mb-2 text-center w-full'><Badge className='mx-auto' size='xs' text='Archived' /></div>}
 
-            <h1 className='flex font-bold items-center justify-center mb-4 text-3xl text-center'>Lead</h1>
+            <h1 className='flex font-bold items-center justify-center text-3xl text-center'>Lead</h1>
+
+            <div className='my-2 text-center'>
+              <Badge className='mx-auto' status={lead.status} text={lead.status} size={'xs'} />
+            </div>
 
             <p className='text-center text-gray-500 text-sm'>Added {moment(lead.creation_date).format('DD/MM/YYYY HH:mm')}</p>
             <p className='text-center text-gray-400 text-xs'>({moment(lead.creation_date).fromNow()})</p>
 
             <p className='font-bold mt-4 mb-4 text-gray-400 uppercase text-xs'>Lead Information</p>
             <div className='border my-4 p-4 rounded'>
-              <table className='w-full'>
-                <tbody>
-                  <tr>
-                    <td className='text-gray-500'>Via</td>
-                    <td>{lead.source}</td>
-                  </tr>
-                  <tr>
-                    <td className='py-2'>
-                      <hr className='border-gray-200 w-full' />
-                    </td>
-                    <td>
-                      <hr className='border-gray-200 w-full' />
-                    </td>
-                  </tr>
-                  <tr>
-                    <td className='text-gray-500'>Type</td>
-                    <td className='capitalize'>{lead.type}</td>
-                  </tr>
-                  <tr>
-                    <td className='text-gray-500'>City</td>
-                    <td className='capitalize'>{lead.city}</td>
-                  </tr>
-                  <tr>
-                    <td className='text-gray-500'>KVM</td>
-                    <td>{lead.kvm} kvm</td>
-                  </tr>
-                </tbody>
-              </table>
+              <LeadInfoTable lead={lead} />
             </div>
 
-            <p className='font-bold mt-4 mb-4 text-gray-400 uppercase text-xs'>Status</p>
-            <div className='border my-4 p-4 rounded'>
-              <Badge className='w-full' status={lead.status} text={lead.status} />
-              {/* <p className='mt-2 text-gray-400 text-right text-sm'>Sent in via {lead.source}</p>  */}
+            <p className='font-bold mt-4 mb-4 text-gray-400 uppercase text-xs'>Address</p>
+            <div className='border mt-4 p-4 rounded'>
+              <UpdateAddressForm lead={lead} />
             </div>
           </Widget>
         </div>
         <div>
-          <Widget margin='mb-4'>
+          <CustomerWidget customer={customer} />
+          <Widget margin='mt-4'>
             <p className='meta-title mb-4'>Quick Actions</p>
-            <div className='gap-y-4 grid grid-cols-1'>
-               
-              <button onClick={() => handleArchive()} className='hover:bg-gray-200 border py-1 rounded transition-all w-full'>
-                Archive
-              </button>
-             
-              <button onClick={() => handleDelete()} className='bg-red-100 hover:bg-red-500 py-1 rounded text-red-500 hover:text-white transition-all w-full'>
-                Delete Lead
-              </button>
-              <ChangeStatusForm lead={lead} />
+            <div className='gap-4 grid grid-cols-2'>
+              <div className='col-span-2'>
+                <ChangeStatusForm lead={lead} />
+              </div>
+              <ArchiveLeadButton lead={lead} />
+              <DeleteLeadButton lead={lead} />
             </div>
           </Widget>
-          <CustomerWidget customer={customer} />
         </div>
         <div>
           {lead.message && (
@@ -135,7 +89,7 @@ const Page = ({ customer, lead }) => {
                 <p>Service Cost: {lead.quote.service} kr</p>
                 <p>Extra Cost: {lead.quote.extra} kr</p>
 
-                {editQuote && <AddQuoteForm lead={lead} />}
+                {editQuote && <LeadQuoteForm lead={lead} />}
 
                 <button type='button' onClick={() => setEditQuote(!editQuote)} className='absolute text-gray-400 hover:text-black top-12 right-12'>
                   <FiEdit />
@@ -143,7 +97,7 @@ const Page = ({ customer, lead }) => {
               </>
             )}
 
-            {!lead.quote && <AddQuoteForm />}
+            {!lead.quote && <LeadQuoteForm lead={lead} />}
           </Widget>
           <Widget title='Sale' margin='mb-4 relative'>
             {lead.sale && (
@@ -152,7 +106,7 @@ const Page = ({ customer, lead }) => {
                 <p>Service Cost: {lead.sale.service} kr (incl. RUT)</p>
                 <p>Extra Cost: {lead.sale.extra} kr</p>
 
-                {editSale && <AddSaleForm lead={lead} />}
+                {editSale && <LeadSaleForm lead={lead} />}
 
                 <button type='button' onClick={() => setEditSale(!editSale)} className='absolute text-gray-400 hover:text-black top-12 right-12'>
                   <FiEdit />
@@ -160,196 +114,22 @@ const Page = ({ customer, lead }) => {
               </>
             )}
 
-            {!lead.sale && <AddSaleForm lead={lead} />}
+            {!lead.sale && <LeadSaleForm lead={lead} />}
+          </Widget>
+          <Widget title='Activity Log' margin='mb-4'>
+            <LeadActivityLog lead={lead} />
           </Widget>
         </div>
         <div>
-          <Widget title='Activity Log' margin='mb-4'>
-            <ul className='text-sm'>
-              <li className='flex items-center'>
-                <FiCircle className='h-4 mr-2 text-green-500 w-4' /> 
-                Lead created 
-                <span className='ml-auto text-gray-400 text-xs'>
-                  {moment(lead.creation_date).fromNow()}
-                </span>
-              </li>
-              {lead.activity_log && lead.activity_log.map((activity, i) => (
-                <li className='flex items-center'>
-                  <FiCircle className='h-4 mr-2 text-gray-500 w-4' /> 
-                  {activity.update}
-                  <span className='ml-auto text-gray-400 text-xs'>
-                    {moment(activity.date).fromNow()}
-                  </span>
-                </li>
-              ))}
-            </ul>
+          <Widget title='Internal Notes' margin='mb-4'>
+            <LeadNotes lead={lead} />
           </Widget>
           <Widget title='Booking Date' margin='mb-4'>
-            {lead.bookingDate}
-            <AddBookingDate lead={lead} />
-          </Widget>
-          <Widget title='Internal Notes'>
-            <AddNotes lead={lead} />
+            <LeadBookingDates lead={lead} />
           </Widget>
         </div>
       </div>
     </DashboardLayout>
-  )
-}
-
-const AddQuoteForm = () => {
-  // Router
-  const router = useRouter()
-  
-  // Handle quote input
-  const handleQuoteValue = async (e) => {
-    e.preventDefault() 
-
-    await fetch(`/api/leads/${router.query._id}`, {
-      body: JSON.stringify({
-        quote: {
-          service: e.target.quote_service.value,
-          extra: e.target.quote_extra.value
-        }
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'PUT'
-    })
-    .then(() => router.push(window.location.pathname)) // Soft refresh
-    .then(() => toast.success('Your quote has been saved.')) // Toast
-  }
-  
-  return (
-    <form onSubmit={handleQuoteValue}>
-      <label className='text-gray-400 text-sm'>Service Cost</label>
-      <input type='number' name='quote_service' className='mb-2 p-2 rounded w-full' />
-      <label className='text-gray-400 text-sm'>Additional Cost</label>
-      <input type='number' name='quote_extra' className='mb-4 p-2 rounded w-full' />
-      <button type='submit' className='bg-gray-100 hover:bg-gray-200 p-2 rounded w-full'>Add Quote</button>
-    </form>
-  )
-}
-
-const AddSaleForm = ({ lead }) => {
-  // Router
-  const router = useRouter()
-  
-  // Handle sale input
-  const handleSaleValue = async (e) => {
-    e.preventDefault() 
-
-    const res = await fetch(`/api/leads/${router.query._id}`, {
-      body: JSON.stringify({
-        sale: {
-          service: e.target.sale_service.value,
-          extra: e.target.sale_extra.value
-        }
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'PUT'
-    })
-    .then(() => router.push(window.location.pathname)) // Soft refresh
-    .then(() => toast.success('Your final cost has been saved.')) // Toast
-  }
-
-  return (
-    <>
-      <form onSubmit={handleSaleValue}>
-        <label className='text-gray-400 text-sm'>Service Cost</label>
-        <input type='number' name='sale_service' className='mb-2 p-2 rounded w-full' placeholder={(lead.quote ? lead.quote.service * 2 : '')} />
-        <label className='text-gray-400 text-sm'>Additional Cost</label>
-        <input type='number' name='sale_extra' className='mb-4 p-2 rounded w-full' placeholder={(lead.quote ? lead.quote.extra : '')} />
-        <button type='submit' className='bg-gray-100 hover:bg-gray-200 p-2 rounded w-full'>Add Sale</button>
-      </form>
-      <p className='mt-4 text-gray-400 text-sm'>If no value is entered, the quote values will be used.</p>
-    </>
-  )
-}
-
-const AddBookingDate = ({ lead }) => {
-  // Router
-  const router = useRouter()
-
-  // States
-  const [date, setDate] = useState(lead.date_booked)
-
-  // useEffect(async () => {
-  //   const res = await fetch(`/api/leads/${router.query._id}`, {
-  //     body: JSON.stringify({
-  //       date_booked: date
-  //     }),
-  //     headers: {
-  //       'Content-Type': 'application/json'
-  //     },
-  //     method: 'PUT'
-  //   })
-  //   .then(() => router.push(window.location.pathname)) // Soft refresh
-  //   .then(() => toast.success('Your Booking Date has been saved.')) // Toast
-  // }, [date])
-  
-  const updateBookingDate = async (value) => {
-    setDate(value)
-    
-    const res = await fetch(`/api/leads/${router.query._id}`, {
-      body: JSON.stringify({
-        date_booked: value
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'PUT'
-    })
-    .then(() => router.push(window.location.pathname)) // Soft refresh
-    .then(() => toast.success('Your Booking Date has been saved.')) // Toast
-  }
-
-  return (
-    <>
-      <form>
-        <label className='text-gray-400 text-sm'>Booking Date</label>
-        <input type='date' name='date' value={moment(date).format('YYYY-MM-DD')} onChange={e => updateBookingDate(e.target.value)} />
-        {/* <button onClick={() => setDate(undefined)} className='hover:bg-gray-200 border border-gray-200 mt-4 py-2 text-gray-400 hover:text-black text-sm transition-all w-full'>Clear Booking Date</button> */}
-      </form>
-    </>
-  )
-}
-
-const AddNotes = ({ lead }) => {
-  const router = useRouter()
-
-  const [notes, setNotes] = useState(lead.notes)
-  const [saving, setSaving] = useState(false)
-
-  useEffect(async () => {
-    setSaving(true)
-    
-    const res = await fetch(`/api/leads/${router.query._id}`, {
-      body: JSON.stringify({
-        notes: notes
-      }),
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      method: 'PUT'
-    })
-    .then(() => router.push(window.location.pathname))
-    .then(() => setSaving(false))
-  }, [notes])
-  
-  return (
-    <>
-      <label className='text-gray-400 text-sm'>These are for internal use only.</label>
-      <textarea value={notes} onChange={e => setNotes(e.target.value)} className='border p-2 rounded w-full'></textarea>
-      {saving && (
-        <div className='flex items-center text-sm'>
-          <FiLoader className='animate-spin mr-2' /> Saving..
-        </div>
-      )}
-    </>
   )
 }
 

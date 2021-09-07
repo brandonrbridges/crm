@@ -41,7 +41,7 @@ const ChangeStatusForm = ({ lead }) => {
       <label>Edit Status</label>
       <select name='status' value={value} onChange={e => handleStatusChange(e.currentTarget.value)} className='capitalize'>
         <option hidden>Select</option>
-        {options.map(option => <option value={option} defaultChecked={(value == option ? true : false)} className='capitalize'>{option}</option>)}
+        {options.map((option, i) => <option key={i} value={option} defaultChecked={(value == option ? true : false)} className='capitalize'>{option}</option>)}
       </select>
     </form>
   )

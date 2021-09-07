@@ -50,16 +50,14 @@ body {
   @apply bg-gray-50;
 }
 
-form {
-  input,
-  select,
-  textarea {
-    @apply border px-2 py-1 w-full;
-  }
-  
-  label {
-    @apply font-normal text-gray-400 text-sm;
-  }
+input,
+select,
+textarea {
+  @apply border px-2 py-1 w-full;
+}
+
+label {
+  @apply font-normal text-gray-400 text-sm;
 }
 
 

@@ -1,8 +1,16 @@
+// Next Auth
 import { getSession } from 'next-auth/client'
 
+// Helpers
 import dbConnect from '@/helpers/dbConnect'
 
+// Models
 import Lead from '@/models/Lead'
+
+// Modules
+import Geocode from 'react-geocode'
+
+Geocode.setApiKey('AIzaSyAWPe6OTNnlXKOtWU65YtdKUkLAEEt0VnQ')
 
 export default async (req, res) => {
   const { _id } = req.query
@@ -23,11 +31,41 @@ export default async (req, res) => {
   if(req.method === 'PUT') {
     const _id = req.query._id
 
-    let lead = await Lead.find({ _id }).lean()
-
-    console.log(req.body)
+    const lead = await Lead.findOne({ _id }).lean()
 
     if(lead) {
+      if(req.body.address && req.body.postcode) {
+
+        console.log(`${req.body.address}, ${req.body.postcode} ${lead.city}, Sweden`)
+        const geo = await Geocode.fromAddress(`${lead.address}, ${lead.postcode} ${lead.city}, Sweden`)
+        const { lat, lng } = geo.results[0].geometry.location
+
+        console.log(lat, lng)
+
+        await Lead.findOneAndUpdate(
+          {
+            _id
+          },
+          {
+            $set: {
+              address: req.body.address,
+              latitude: lat,
+              longitude: lng,
+              postcode: req.body.postcode,
+            },
+            $push: {
+              activity_log: {
+                date: Date.now(),
+                update: 'Address updated'
+              }
+            }
+          },
+          {
+            new: true
+          }
+        )
+      } 
+
       if(req.body.archived) {
         await Lead.findOneAndUpdate(
           {
@@ -134,6 +172,29 @@ export default async (req, res) => {
               activity_log: {
                 date: Date.now(),
                 update: `Booking date updated`
+              }
+            }
+          },
+          {
+            new: true
+          }
+        )
+      }
+
+      if(req.body.date_booked_end) {
+        await Lead.findOneAndUpdate(
+          {
+            _id
+          },
+          {
+            $set: {
+              date_booked_end: req.body.date_booked_end,
+              status: 'booked'
+            },
+            $push: {
+              activity_log: {
+                date: Date.now(),
+                update: `End Booking date updated`
               }
             }
           },
