@@ -11,6 +11,7 @@ import { Calendar, momentLocalizer } from 'react-big-calendar'
 // Styles
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import { FiXCircle } from 'react-icons/fi'
+import CustomerWidget from '@/components/CustomerProfile'
 
 const localizer = momentLocalizer(moment)
 
@@ -49,6 +50,8 @@ const Page = ({ leads }) => {
   const clickedEvent = async (event) => {
     setEventInfo(event.lead)
     setShowModal(true)
+
+    console.log(event.lead)
   }
 
   const closeModal = () => {
@@ -64,7 +67,13 @@ const Page = ({ leads }) => {
             <button onClick={() => closeModal()} className='absolute text-gray-400 hover:text-black top-12 right-12'>
               <FiXCircle />
             </button>
-            <p className='font-bold text-xl'>{eventInfo.customer.name}</p>
+            <div className='gap-4 grid grid-cols-4'>
+              <div>
+                <div className='gap-y-4 grid grid-cols-1'>
+                  {/* <CustomerWidget customer={eventInfo.lead.customer} /> */}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

@@ -1,3 +1,6 @@
+// React
+import { useState } from 'react'
+
 // Next
 import Head from 'next/head'
 import Image from 'next/image'
@@ -8,7 +11,6 @@ import { getSession, signIn, signOut, useSession } from 'next-auth/client'
 
 // Components
 import NavItem from '@/components/NavigationItem'
-import Search from '@/components/Search'
 
 // Modules
 import { initNotifications } from 'browser-notification'
@@ -18,7 +20,7 @@ import GoBack from '@/components/GoBack'
 
 const Dashboard = ({ children, title }) => {
   const [session] = useSession()
-
+  
   if(typeof window !== 'undefined') {
     initNotifications()
   }

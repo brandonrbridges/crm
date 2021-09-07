@@ -31,10 +31,10 @@ const Page = ({ customer, leads }) => {
   // Leads loop
   leads.map(lead => {
     // Add to Quote Value
-    if(lead.quote_value && !lead.sale_value) predictedValue += lead.quote_value
+    if(lead.quote.service > 0 && !lead.sale) predictedValue += (lead.quote.service + lead.quote.extra)
 
     // Add to Sale Value
-    if(lead.sale_value) value += lead.sale_value 
+    if(lead.sale.service > 0 && lead.sale.extra > 0) value += (lead.sale.service + lead.sale.extra) 
   })
   
   return (
@@ -90,7 +90,7 @@ const PreviousLeadsTable = ({ leads }) => {
         {leads.map((lead, index) => (
           <tr className='text-sm' key={index}>
             <td>{moment(lead.creation_date).format('DD/MM/YY @ h:mm a')}</td>
-            <td>{lead.sale_value ? `${lead.sale_value} kr` : lead.quote_value ? `${lead.quote_value} kr` : 'N/A'}</td>
+            <td>{lead.sale.service > 0 ? `${lead.sale.service + lead.sale.extra} kr` : lead.quote.service > 0 ? `${lead.quote.service + lead.quote.extra} kr` : 'N/A'}</td>
             <td><Badge size='xs' status={lead.status} text={lead.status} /></td>
           </tr>
         ))}

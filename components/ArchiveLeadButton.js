@@ -18,7 +18,7 @@ const ArchiveLeadButton = ({ lead }) => {
   }
   
   return (
-    <button onClick={() => archiveLead(lead._id)} className='hover:bg-gray-200 border py-1 rounded transition-all w-full'>
+    <button onClick={() => archiveLead(lead._id)} className='hover:bg-gray-200 border py-1 rounded text-sm transition-all w-full'>
       {(!isArchived ? 'Archive' : 'Unarchive')}
     </button>
   )

@@ -6,11 +6,10 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 
 // Components
-import AddLead from '@/components/AddLead'
 import Badge from '@/components/Badge'
 
 // Modules
-import { FiCheckCircle, FiFileText, FiEye, FiPhoneCall, FiRefreshCcw, FiXCircle } from 'react-icons/fi'
+import { FiCheckCircle, FiFileText, FiPhoneCall, FiRefreshCcw, FiXCircle } from 'react-icons/fi'
 import moment from 'moment'
 import toast from 'react-hot-toast'
 
@@ -20,7 +19,7 @@ const Leads = ({ leads, prefilter, hideFilters }) => {
   const [filterText, setFilterText] = useState(null)
 
   // Variables
-  const headers = ['Status', 'Customer', 'Phone', 'Email', 'Source', 'Type', 'KVM', 'City', 'Date', 'Quick Actions', <AddLead />]
+  const headers = ['Status', 'Customer', 'Phone', 'Email', 'Source', 'Type', 'KVM', 'City', 'Date', 'Quick Actions']
 
   // Filter
   const filter = value => {
@@ -45,7 +44,7 @@ const Leads = ({ leads, prefilter, hideFilters }) => {
     if(prefilter) {
       filter(prefilter)
     }
-  }, [])
+  })
 
   return (
     <>
@@ -144,11 +143,6 @@ const TableRow = ({ lead }) => {
         <span className='text-gray-400 text-xs'>({moment(lead.creation_date).fromNow()})</span>
       </td>
       <td className='flex'>
-        <Link href={`/leads/${lead._id}`}>
-          <a className=' bg-pink-100 button hover:bg-pink-300 hover:text-white' target='_blank'>
-            <FiEye className='h-4 w-4' />
-          </a>
-        </Link>
         <button onClick={() => handleStatusChange('called')} className='bg-blue-100 hover:bg-blue-300 hover:text-white'>
           <FiPhoneCall className='h-4 w-4' />
         </button>

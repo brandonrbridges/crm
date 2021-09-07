@@ -17,11 +17,6 @@ const CustomerWidget = ({ customer }) => {
   
   return (
     <Widget>
-      {/* Complete soon */}
-      {/* <button onClick={() => setEditMode(!editMode)}>Toggle Edit Mode</button> */}
-
-      {/* <div className='block bg-gray-300 h-24 mb-6 mx-auto rounded-full w-24'></div> */}
-
       {isToday(customer.creation_date) && <div className='mb-2 text-center w-full'><Badge className='mx-auto' size='xs' status='new' text='New Customer' /></div>}
 
       <h1 className='flex font-bold items-center justify-center mb-4 text-3xl text-center'>
@@ -35,7 +30,7 @@ const CustomerWidget = ({ customer }) => {
         ({moment(customer.creation_date).fromNow()})
       </p>
 
-      <div className='border mt-4 p-4 rounded'>
+      <div className='border my-4 p-4 rounded'>
         <table className='w-full'>
           <tbody>
             <tr>

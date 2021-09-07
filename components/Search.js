@@ -18,9 +18,9 @@ const Search = ({ items }) => {
     threshold: 0.2
   }
 
-  const fuse = new Fuse(items, options)
-
+  
   useEffect(() => {
+    const fuse = new Fuse(items, options)
     const r = fuse.search(term)
     setResults(r)
   }, [term])
