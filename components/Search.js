@@ -12,18 +12,19 @@ const Search = ({ items }) => {
   const [term, setTerm] = useState('')
   const [results, setResults] = useState([])
 
-  const options = {
-    includeScore: true,
-    keys: ['customer.name', 'customer.email', 'city', 'type', 'source'],
-    threshold: 0.2
-  }
-
+  
   
   useEffect(() => {
+    const options = {
+      includeScore: true,
+      keys: ['customer.name', 'customer.email', 'city', 'type', 'source'],
+      threshold: 0.2
+    }
+
     const fuse = new Fuse(items, options)
     const r = fuse.search(term)
     setResults(r)
-  }, [term])
+  }, [term, items])
 
   return (
     <div className='mb-4 relative z-10'>

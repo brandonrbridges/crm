@@ -6,20 +6,24 @@ import { FiLoader } from 'react-icons/fi'
 
 const LeadNotes = ({ lead }) => {
   const router = useRouter()
-
+  
   const [notes, setNotes] = useState(lead.notes)
   const [saving, setSaving] = useState(false)
 
-  useEffect(async () => {
+  useEffect(() => {
     setSaving(true)
-    
-    await fetch(`/api/leads/${router.query._id}`, {
-      body: JSON.stringify({ notes: notes }),
-      headers: { 'Content-Type': 'application/json' },
-      method: 'PUT'
+
+    (async () => {
+
+      await fetch(`/api/leads/${router.query._id}`, {
+        body: JSON.stringify({ notes: notes }),
+        headers: { 'Content-Type': 'application/json' },
+        method: 'PUT'
+      })
+      .then(() => router.push(window.location.pathname))
+      .then(() => setSaving(false))
     })
-    .then(() => router.push(window.location.pathname))
-    .then(() => setSaving(false))
+    
   }, [notes])
   
   return (

@@ -12,7 +12,7 @@ import Geocode from 'react-geocode'
 
 Geocode.setApiKey('AIzaSyAWPe6OTNnlXKOtWU65YtdKUkLAEEt0VnQ')
 
-export default async (req, res) => {
+const api = async (req, res) => {
   const { _id } = req.query
   const user = await getSession({ req })
 
@@ -226,3 +226,5 @@ export default async (req, res) => {
 
   res.end()
 }
+
+export default api

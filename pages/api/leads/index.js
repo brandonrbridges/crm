@@ -13,7 +13,7 @@ import Customer from '@/models/Customer'
 import { initNotifications, notify } from 'browser-notification'
 
 
-export default async (req, res) => {
+const api = async (req, res) => {
   const user = await getSession({ req })
 
   await dbConnect()
@@ -154,3 +154,5 @@ export default async (req, res) => {
 
   res.end()
 }
+
+export default api
